@@ -31,7 +31,8 @@ void fillPopInteractiveOutDataEvent(AppletHolder *holder){
     
 }
 
-WebSession::WebSession(AppletHolder* holder)
+WebSession::WebSession(AppletHolder* holder) :
+    messagesToSend{WebSession::tupleComparator, std::vector<PriorizedMessage>{SENDING_QUEUE_SIZE}}
 {
     handlers = std::list<std::unique_ptr<WebSessionHandler>>();
     this->appletHolder = holder;
@@ -43,14 +44,22 @@ WebSession::WebSession(AppletHolder* holder)
     }
 
     ueventCreate(&this->messageOnQueueEvent, false);
+    ueventCreate(&this->queueAvaiableEvent, false);
+    ueventSignal(&this->queueAvaiableEvent);
 }
 
 WebSession::~WebSession(){
     threadClose(&this->thread);
 }
 
-void WebSession::sendMessage(const std::vector<u8> &&data){
-    this->messagesToSend.push(std::forward<const std::vector<u8>>(data));
+void WebSession::sendMessage(const std::vector<u8> &&data, u8 priority){
+    std::scoped_lock<std::mutex> scLock{messageStorageLock};
+    if(messagesToSend.size() == SENDING_QUEUE_SIZE){
+        throw WebSessionQueueCollapsed{};
+    }else if(messagesToSend.size() == SENDING_QUEUE_SIZE - 1){
+        ueventClear(&queueAvaiableEvent);
+    }
+    messagesToSend.push(std::make_tuple(priority,std::forward<const std::vector<u8>>(data)));
     ueventSignal(&messageOnQueueEvent);
 }
 
@@ -138,75 +147,6 @@ void WebSession::threadExec(){
             break;
         }
     }
-}
-
-void WebSession::calibrateWhateverValue(){
-    AppletStorage storage;
-    {
-        g_Logger.print("Calibration send message");
-        char string[] = "SYNC";
-        std::vector<u8> message(sizeof(SessionMessageHeader) + sizeof(string));
-
-        auto header = reinterpret_cast<SessionMessageHeader*>(message.data());
-        header->messageID = 0x0;
-        header->pad = 0;
-        header->size = sizeof(string);
-
-        char *data = reinterpret_cast<char*>(message.data() + sizeof(SessionMessageHeader));
-        memcpy(data, &string, sizeof(string));
-
-        Result rc = appletCreateStorage(&storage, message.size());
-        if(R_FAILED(rc)){
-            throw rc;
-        }
-
-        rc = appletStorageWrite(&storage, 0, message.data(), message.size());
-        if(R_FAILED(rc)){
-            appletStorageClose(&storage);
-            throw rc;
-        }
-
-        rc = appletHolderPushInteractiveInData(appletHolder, &storage);
-        if(R_FAILED(rc)){
-            appletStorageClose(&storage);
-            throw rc;
-        }
-    }
-    
-    g_Logger.print("Calibration send ended");
-
-    {
-        appletHolderWaitInteractiveOut(appletHolder);
-
-        g_Logger.print("Calibration receive");
-
-        Result rc = appletHolderPopInteractiveOutData(this->appletHolder, &storage);
-        if(R_FAILED(rc)){
-            throw rc;
-        }
-
-        s64 size;
-        rc = appletStorageGetSize(&storage, &size);
-        if(R_FAILED(rc)){
-            appletStorageClose(&storage);
-            throw rc;
-        }
-
-        std::vector<u8> message(size);
-        rc = appletStorageRead(&storage, 0, message.data(), size);
-        if(R_FAILED(rc)){
-            appletStorageClose(&storage);
-            throw rc;
-        }
-
-        g_Logger.print("Ack buffer:");
-        g_Logger.printBuffer(message);
-
-        AckData* data = reinterpret_cast<AckData*>(message.data() + sizeof(struct SessionMessageHeader));
-        theWhateverValue = data->whatever;
-        g_Logger.print("The whatever value is " + std::to_string(theWhateverValue));
-    }
-    
 }
 
 void WebSession::processIncomingMessage(){
@@ -314,8 +254,13 @@ void WebSession::ackIncomingMessage(u32 storageSizeToAck){
 
 void WebSession::processOutcomingMessage(){
     if(!this->messagesToSend.empty()){
-        const std::vector<u8> buffer = this->messagesToSend.front();
-        this->messagesToSend.pop();
+        std::vector<u8> buffer;
+        {
+            std::scoped_lock<std::mutex> scLock{messageStorageLock};
+            buffer = std::move(std::get<1>(messagesToSend.top()));
+            messagesToSend.pop();
+        }
+        ueventSignal(&queueAvaiableEvent);
 
         struct SessionMessageHeader header {
             .messageID = 0x0,
