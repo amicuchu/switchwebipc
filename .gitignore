@@ -27,6 +27,13 @@
 *.lib
 
 # Executables
-*.exe
-*.out
-*.app
+build
+*.elf
+*.nacp
+*.nro
+*.nso
+*.pfs0
+
+html/dist
+html/node_modules
+html/package-lock.json

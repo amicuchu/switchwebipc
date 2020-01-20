@@ -1,0 +1,27 @@
+{
+  "name": "miniature",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack --mode development",
+    "run": "npm run-script build"
+  },
+  "author": "amicuchu",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "awesome-typescript-loader": "^5.2.1",
+    "html-webpack-plugin": "^3.2.0",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  },
+  "dependencies": {
+    "clsx": "^1.0.4",
+    "react": "^16.11.0",
+    "react-dom": "^16.11.0",
+    "react-jss": "^10.0.0"
+  }
+}
