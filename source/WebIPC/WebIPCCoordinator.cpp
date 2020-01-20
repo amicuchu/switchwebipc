@@ -1,14 +1,7 @@
 #include <string>
+#include "../Log.hpp"
 #include "WebIPCCoordinator.hpp"
-#include "../../cpp-base64/base64.h"
-
-constexpr int a(int b){
-    return b;
-}
-
-inline void sendErrorMessage(WebIPCCoordinator *coord, u64 error){
-    
-}
+#include "../base64.h"
 
 WebIPCCoordinator::WebIPCCoordinator() : 
     submodules{},
@@ -17,13 +10,37 @@ WebIPCCoordinator::WebIPCCoordinator() :
 
 }
 
-
 WebIPCCoordinator::~WebIPCCoordinator(){
     auto requests = pendingRequests;
     for(auto &request : requests){
         if(request.second->cancelRequest){
             request.second->cancelRequest();
         }
+    }
+}
+
+void WebIPCCoordinator::sendMsgPack(const MsgPack &pack){
+    auto const &packedMessage = pack.dump();
+    std::vector<u8> encodedMessage = base64_encode(reinterpret_cast<const unsigned char*>(packedMessage.data()), packedMessage.size());
+    if(webSession.expired()){
+        throw WebSessionClosedException{};
+    }
+    webSession.lock()->sendMessage(std::move(encodedMessage)); 
+}
+
+void WebIPCCoordinator::errorInmediateRequest(u32 errorCode){
+    sendMsgPack(MsgPack::array{MsgPack{nullptr}, MsgPack{errorCode}});
+}
+
+void WebIPCCoordinator::removeRequestID(u32 requestID){
+    {
+        std::scoped_lock scLock{this->requestStorageLock};
+        auto request = pendingRequests.find(requestID);
+        if(request == pendingRequests.end()){
+            throw InvalidRequestIDException{};
+        }
+
+        pendingRequests.erase(requestID);
     }
 }
 
@@ -38,31 +55,44 @@ void WebIPCCoordinator::handleMessage(const std::vector<u8> &encodedData){
     
     auto parsedMsg = MsgPack::parse(reinterpret_cast<const char*>(data.data()), data.size(), err);
     if(!parsedMsg.is_array()){
-        throw "Root is not an array";
+        errorInmediateRequest(MsgPackIPCError::RootNotAnArray);
+        return;
     }
 
     if(parsedMsg.array_items().size() != 3){
-        throw "The root isn't an array of 3 elements";
+        errorInmediateRequest(MsgPackIPCError::RootIncorrectSize);
+        return;
     }
     
     auto submodule = parsedMsg.array_items()[0];
     if(!submodule.is_uint8()){
-        throw "Submodule isn't a u8";
+        errorInmediateRequest(MsgPackIPCError::SubmoduleIncorrectType);
+        return;
     }
 
     auto submodulesIterPair = submodules.find(submodule.uint8_value());
     if(submodulesIterPair == submodules.end()){
-        throw "Submodule isn't registered in the coordinator";
+        errorInmediateRequest(MsgPackIPCError::SubmoduleNotFound);
+        return;
     }
 
     auto action = parsedMsg[1];
     if(!action.is_uint32()){
-        throw "Action isn't a u32";
+        errorInmediateRequest(MsgPackIPCError::ActionIncorrectType);
+        return;
     }
     
     WebIPCRequest* request;
     {
         std::scoped_lock scLock{this->requestStorageLock};
+
+        if(pendingRequests.size() > REQUEST_LIST_SIZE){
+            errorInmediateRequest(0);
+            return;
+        }
+
+        while(pendingRequests.count(nextID) > 0) nextID++;
+
         request = new WebIPCRequest{
             .requestID = nextID++,
             .submodule = submodule.uint8_value(),
@@ -71,31 +101,38 @@ void WebIPCCoordinator::handleMessage(const std::vector<u8> &encodedData){
             .cancelRequest = nullptr,
             .requestData = parsedMsg[2]
         };
+
+        g_Logger.print("WebIPCCoordinator: A new request has been assigned to ID " + 
+                       std::to_string(request->requestID) + " for submodule " + std::to_string(request->submodule) + 
+                       " action " + std::to_string(request->action));
+
         pendingRequests[request->requestID] = request;
     }
-    submodulesIterPair->second->handleRequest(request);
+
+    try{
+        submodulesIterPair->second->handleRequest(request);
+    }catch(...){
+        g_Logger.print("WebIPCCoordinator: The request raised unknown exception on handling");
+        errorInmediateRequest(MsgPackIPCError::UnknownErrorInHandlingRequest);
+        removeRequestID(request->requestID);
+    }
 }
 
 void WebIPCCoordinator::answerRequest(uint32_t requestID, MsgPack packAnswer, bool lastAnswer){
-    MsgPack packMessage;
-    {
-        std::scoped_lock scLock{this->requestStorageLock};
-        auto request = pendingRequests.find(requestID);
-        if(request == pendingRequests.end()){
-            throw "Invalid ID";
-        }
-
-        if(lastAnswer) pendingRequests.erase(requestID);
-
-        packMessage = MsgPack::array{MsgPack{requestID}, MsgPack{request->second->action}, MsgPack{lastAnswer}, packAnswer};
+    if(lastAnswer){
+        removeRequestID(requestID);
+        g_Logger.print("WebIPCCoordinator: The request " + std::to_string(requestID) + " ended succesfully");
     }
-    auto const &packedMessage = packMessage.dump();
-    std::vector<u8> encodedMessage = base64_encode(reinterpret_cast<const unsigned char*>(packedMessage.data()), packedMessage.size());
-    if(webSession.expired()){
-        throw "WebSession closed";
-    }
-    webSession.lock()->sendMessage(std::move(encodedMessage)); 
-    
+
+    sendMsgPack(MsgPack::array{MsgPack{requestID}, MsgPack{lastAnswer}, packAnswer});
+}
+
+void WebIPCCoordinator::errorRequest(uint32_t requestID, u32 errorCode){
+    removeRequestID(requestID);
+
+    g_Logger.print("WebIPCCoordinator: The request " + std::to_string(requestID) + " ended in error " + std::to_string(errorCode));
+
+    sendMsgPack(MsgPack::array{MsgPack{requestID}, MsgPack{errorCode}});
 }
 
 

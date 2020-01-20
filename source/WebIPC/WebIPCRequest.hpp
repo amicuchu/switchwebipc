@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include <functional>
-#include "../../msgpack11/msgpack11.hpp"
+#include "../msgpack11.hpp"
 #include "WebIPCCoordinator.hpp"
 
 using msgpack11::MsgPack;
