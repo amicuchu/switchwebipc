@@ -44559,6 +44559,7 @@ function Control(props) {
         //Default handler
         if (!ev.pressed)
             return;
+        window["evev"] = ev;
         if (ev.isButtonPressed(_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].UpPad)) {
             console.log("up");
             if (navigationProps.navigateUp) {
