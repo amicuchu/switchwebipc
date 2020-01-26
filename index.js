@@ -44128,10 +44128,188 @@ module.exports = function(originalModule) {
 
 /***/ }),
 
-/***/ "./src/Actions.tsx":
-/*!*************************!*\
-  !*** ./src/Actions.tsx ***!
-  \*************************/
+/***/ "./src/App.tsx":
+/*!*********************!*\
+  !*** ./src/App.tsx ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return App; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var _CommandBar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommandBar */ "./src/CommandBar.tsx");
+/* harmony import */ var _OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./OneAxisLayout */ "./src/OneAxisLayout.tsx");
+/* harmony import */ var _ListButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ListButton */ "./src/ListButton.tsx");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Contexts/Animation */ "./src/Contexts/Animation.tsx");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
+
+
+
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    appContainer: {
+        position: "fixed",
+        width: 1280,
+        height: 720,
+        backgroundColor: "#ebebeb"
+    },
+    contentContainer: {
+        margin: "3cm"
+    }
+});
+function App() {
+    const classes = useStyles();
+    const [focusedRow, setFocusedRow] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContextProvider"], null,
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_6__["AnimationContextProvide"], null,
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.appContainer },
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.contentContainer },
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__["default"], null,
+                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"),
+                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"),
+                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { actionMap: new Map([[_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, "Purge", () => { })]]) }, "Hello world"),
+                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"))),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandBar__WEBPACK_IMPORTED_MODULE_2__["default"], null))));
+}
+
+
+/***/ }),
+
+/***/ "./src/CommandBar.tsx":
+/*!****************************!*\
+  !*** ./src/CommandBar.tsx ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CommandBar; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var _CommandButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommandButton */ "./src/CommandButton.tsx");
+/* harmony import */ var _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Icons/ButtonA */ "./src/Icons/ButtonA.tsx");
+/* harmony import */ var _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Icons/ButtonX */ "./src/Icons/ButtonX.tsx");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
+
+
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    commandBar: {
+        boxSizing: "border-box",
+        position: "absolute",
+        width: "100%",
+        height: "70px",
+        bottom: "0",
+        padding: "0 30px"
+    },
+    separator: {
+        width: "100%",
+        height: "1px",
+        backgroundColor: "black"
+    }
+});
+function CommandBar() {
+    const classes = useStyles();
+    const [actionMap, setActionMap] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(new Map());
+    const handleActionMapChange = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((actionMap) => {
+        console.log("NewMap");
+        console.log(actionMap);
+        setActionMap(actionMap);
+    }, []);
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContext"]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        actionManager.addListener(handleActionMapChange);
+        return () => actionManager.removeHandler(handleActionMapChange);
+    }, []);
+    const actions = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => {
+        let res = new Array();
+        for (const [button, action] of actionMap) {
+            action.assignedButton = button;
+            res.push(action);
+        }
+        console.log(res);
+        return res;
+    }, [actionMap]);
+    const iconButtonMap = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => new Map([
+        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].A, _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__["default"]],
+        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__["default"]]
+    ]), []);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.commandBar },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.separator }),
+        actions.map((action) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandButton__WEBPACK_IMPORTED_MODULE_2__["default"], { iconButton: react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(iconButtonMap.get(action.assignedButton)), key: action.assignedButton, text: action.label })));
+}
+
+
+/***/ }),
+
+/***/ "./src/CommandButton.tsx":
+/*!*******************************!*\
+  !*** ./src/CommandButton.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CommandButton; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    commandButton: {
+        display: "inline-flex",
+        alignItems: "center",
+        borderRadius: "5px",
+        padding: "18px 21px"
+    },
+    commandButtonActive: {
+        backgroundColor: "#00f5ff17"
+    },
+    text: {
+        marginLeft: "12px"
+    }
+});
+function CommandButton({ iconButton, text }) {
+    const classes = useStyles();
+    const [isActive, setActive] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+    const handleActivate = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        setActive(true);
+    }, []);
+    const handleDeactivate = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        setActive(false);
+    }, []);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: Object(clsx__WEBPACK_IMPORTED_MODULE_2__["default"])(classes.commandButton, isActive && classes.commandButtonActive), onTouchStart: handleActivate, onTouchEnd: handleDeactivate },
+        iconButton,
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { className: classes.text }, text));
+}
+
+
+/***/ }),
+
+/***/ "./src/Contexts/Actions.tsx":
+/*!**********************************!*\
+  !*** ./src/Contexts/Actions.tsx ***!
+  \**********************************/
 /*! exports provided: Action, ActionContext, ActionContextProvider */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44205,184 +44383,6 @@ class ActionManager {
 const ActionContext = react__WEBPACK_IMPORTED_MODULE_0___default.a.createContext(null);
 function ActionContextProvider({ children }) {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ActionContext.Provider, { value: new ActionManager() }, children);
-}
-
-
-/***/ }),
-
-/***/ "./src/App.tsx":
-/*!*********************!*\
-  !*** ./src/App.tsx ***!
-  \*********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return App; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
-/* harmony import */ var _CommandBar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommandBar */ "./src/CommandBar.tsx");
-/* harmony import */ var _OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./OneAxisLayout */ "./src/OneAxisLayout.tsx");
-/* harmony import */ var _ListButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ListButton */ "./src/ListButton.tsx");
-/* harmony import */ var _Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Actions */ "./src/Actions.tsx");
-/* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Contexts/Animation */ "./src/Contexts/Animation.tsx");
-/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
-
-
-
-
-
-
-
-
-const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
-    appContainer: {
-        position: "fixed",
-        width: 1280,
-        height: 720,
-        backgroundColor: "#ebebeb"
-    },
-    contentContainer: {
-        margin: "3cm"
-    }
-});
-function App() {
-    const classes = useStyles();
-    const [focusedRow, setFocusedRow] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContextProvider"], null,
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_6__["AnimationContextProvide"], null,
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.appContainer },
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.contentContainer },
-                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__["default"], null,
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { actionMap: new Map([[_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, new _Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, "Purge", () => { })]]) }, "Hello world"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "Hello world"))),
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandBar__WEBPACK_IMPORTED_MODULE_2__["default"], null))));
-}
-
-
-/***/ }),
-
-/***/ "./src/CommandBar.tsx":
-/*!****************************!*\
-  !*** ./src/CommandBar.tsx ***!
-  \****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CommandBar; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
-/* harmony import */ var _CommandButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommandButton */ "./src/CommandButton.tsx");
-/* harmony import */ var _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Icons/ButtonA */ "./src/Icons/ButtonA.tsx");
-/* harmony import */ var _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Icons/ButtonX */ "./src/Icons/ButtonX.tsx");
-/* harmony import */ var _Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Actions */ "./src/Actions.tsx");
-/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
-
-
-
-
-
-
-
-const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
-    commandBar: {
-        boxSizing: "border-box",
-        position: "absolute",
-        width: "100%",
-        height: "70px",
-        bottom: "0",
-        padding: "0 30px"
-    },
-    separator: {
-        width: "100%",
-        height: "1px",
-        backgroundColor: "black"
-    }
-});
-function CommandBar() {
-    const classes = useStyles();
-    const [actionMap, setActionMap] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(new Map());
-    const handleActionMapChange = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((actionMap) => {
-        console.log("NewMap");
-        console.log(actionMap);
-        setActionMap(actionMap);
-    }, []);
-    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContext"]);
-    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
-        actionManager.addListener(handleActionMapChange);
-        return () => actionManager.removeHandler(handleActionMapChange);
-    }, []);
-    const actions = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => {
-        let res = new Array();
-        for (const [button, action] of actionMap) {
-            action.assignedButton = button;
-            res.push(action);
-        }
-        console.log(res);
-        return res;
-    }, [actionMap]);
-    const iconButtonMap = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => new Map([
-        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].A, _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__["default"]],
-        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__["default"]]
-    ]), []);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.commandBar },
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.separator }),
-        actions.map((action) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandButton__WEBPACK_IMPORTED_MODULE_2__["default"], { iconButton: react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(iconButtonMap.get(action.assignedButton)), key: action.assignedButton, text: action.label })));
-}
-
-
-/***/ }),
-
-/***/ "./src/CommandButton.tsx":
-/*!*******************************!*\
-  !*** ./src/CommandButton.tsx ***!
-  \*******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CommandButton; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
-/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
-
-
-
-const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
-    commandButton: {
-        display: "inline-flex",
-        alignItems: "center",
-        borderRadius: "5px",
-        padding: "18px 21px"
-    },
-    commandButtonActive: {
-        backgroundColor: "#00f5ff17"
-    },
-    text: {
-        marginLeft: "12px"
-    }
-});
-function CommandButton({ iconButton, text }) {
-    const classes = useStyles();
-    const [isActive, setActive] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
-    const handleActivate = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
-        setActive(true);
-    }, []);
-    const handleDeactivate = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
-        setActive(false);
-    }, []);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: Object(clsx__WEBPACK_IMPORTED_MODULE_2__["default"])(classes.commandButton, isActive && classes.commandButtonActive), onTouchStart: handleActivate, onTouchEnd: handleDeactivate },
-        iconButton,
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { className: classes.text }, text));
 }
 
 
@@ -44529,7 +44529,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
-/* harmony import */ var _Actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Actions */ "./src/Actions.tsx");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Contexts/Actions */ "./src/Contexts/Actions.tsx");
 /* harmony import */ var _Contexts_Focus__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Contexts/Focus */ "./src/Contexts/Focus.tsx");
 /* harmony import */ var _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Contexts/Navigation */ "./src/Contexts/Navigation.tsx");
 /* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Contexts/Animation */ "./src/Contexts/Animation.tsx");
@@ -44541,7 +44541,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function Control(props) {
     const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
-    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Actions__WEBPACK_IMPORTED_MODULE_2__["ActionContext"]);
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_2__["ActionContext"]);
     const focusProps = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_3__["FocusContext"]);
     const navigationProps = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_4__["NavigationContext"]);
     const animationManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__["AnimationContext"]);
@@ -44594,7 +44594,7 @@ function Control(props) {
     let actionMap = props.actionMap;
     if (!actionMap) {
         actionMap = new Map([
-            [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].A, new _Actions__WEBPACK_IMPORTED_MODULE_2__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].A, "Accept", () => { })]
+            [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].A, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_2__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].A, "Accept", () => { })]
         ]);
     }
     //Focus effect
@@ -45087,12 +45087,12 @@ class HIDSubmodule {
 class HIDSubmoduleSimulation extends HIDSubmodule {
     constructor() {
         super(null);
-        this.lastButtonReading = new Array(10).fill(0);
+        this.lastButtonReading = new Array(16).fill(0);
     }
     activateHIDEvents() {
         this.timeHandle = setInterval(() => {
             this.pollGamepads();
-        }, 1000);
+        }, 1000 / 60);
         this.handleKeyDownBind = this.handleKeyDown.bind(this);
         document.addEventListener("keydown", this.handleKeyDownBind);
     }
@@ -45138,6 +45138,17 @@ HIDSubmoduleSimulation.buttonMapping = {
     2: HIDButtonBitField.Y,
     3: HIDButtonBitField.X,
     4: HIDButtonBitField.L,
+    5: HIDButtonBitField.R,
+    6: HIDButtonBitField.ZL,
+    7: HIDButtonBitField.ZR,
+    8: HIDButtonBitField.Minus,
+    9: HIDButtonBitField.Plus,
+    10: HIDButtonBitField.LeftStick,
+    11: HIDButtonBitField.RightSitck,
+    12: HIDButtonBitField.UpPad,
+    13: HIDButtonBitField.DownPad,
+    14: HIDButtonBitField.LeftPad,
+    15: HIDButtonBitField.RightPad
 };
 
 
@@ -45177,6 +45188,9 @@ globalStyle.innerText = "\
 }";
 document.head.appendChild(globalStyle);
 //window.webipc.gamepad.simulate();
+if (window.nx) {
+    window.nx.footer.setFixed("hidden");
+}
 window.webIPC = {
     hid: new _WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDSubmoduleSimulation"](),
 };
