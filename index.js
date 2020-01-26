@@ -44550,8 +44550,9 @@ function Control(props) {
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         focusProps.notifyFocusability(true);
     }, []);
-    const handleHIDButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((ev) => {
-        console.log(navigationProps);
+    const handleHIDButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((evP) => {
+        //Webkit makes custom events not have prototype, migrate from plane object
+        const ev = _WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonEvent"].clonePlaneObject(evP);
         if (props.onHIDButton) {
             props.onHIDButton(ev);
             return;
@@ -44559,7 +44560,6 @@ function Control(props) {
         //Default handler
         if (!ev.pressed)
             return;
-        window["evev"] = ev;
         if (ev.isButtonPressed(_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].UpPad)) {
             console.log("up");
             if (navigationProps.navigateUp) {
@@ -45063,6 +45063,9 @@ class HIDButtonEvent extends Event {
         super("hidButtonEvent", { bubbles: true });
         this.button = bt;
         this.pressed = pr;
+    }
+    static clonePlaneObject(evPlane) {
+        return new HIDButtonEvent(evPlane.button, evPlane.pressed);
     }
     isButtonPressed(button) {
         return !!(this.button & button) && this.pressed;
