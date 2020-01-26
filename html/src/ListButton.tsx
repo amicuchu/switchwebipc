@@ -1,6 +1,9 @@
 import React from "react"
 import {createUseStyles} from "react-jss"
 import clsx from "clsx"
+import {Control, ControlOutputProps} from "./Control"
+import OutlineBox from "./OutlineBox"
+import { ActionMap } from "./Contexts/Actions"
 
 const useStyles = createUseStyles({
     listButton: {
@@ -32,52 +35,22 @@ const useStyles = createUseStyles({
     } 
 });
 
-export default function ListButton({children}:{children: any}){
+export default function ListButton({children, actionMap}:{children:any, actionMap?:ActionMap}){
     const classes = useStyles();
 
-    const [isActive, setActive] = React.useState(false);
 
-    const outlineRef : React.Ref<HTMLDivElement> = React.createRef();
-    React.useEffect(() =>  {
-        if(outlineRef.current){
-            outlineRef.current.animate([
-                {borderColor: "#59fcdd"},
-                {borderColor: "#06bcc7"},
-                {borderColor: "#59fcdd"}
-            ], {duration: 1000, iterations: Infinity});
+    return <Control actionMap={actionMap}>
+        {({reference, isFocused, isTouched}:ControlOutputProps) =>
+            <div ref={reference}
+                    className={clsx(classes.listButton,
+                                    isFocused && classes.listButtonActive)}>
+                <div className={clsx(classes.contentBox,
+                    isTouched && classes.contentBoxHover)}>
+                    {children}
+                </div>
+                <OutlineBox visible={isFocused}/>
+            </div>
         }
-    }, [outlineRef.current, isActive]);
-    const [isHovered, setHover] = React.useState(false);
-
-    const handleHoverIn = React.useCallback(() => {
-        setHover(true);
-    }, []);
-
-    const handleHoverOut = React.useCallback(() => {
-        setHover(false);
-    }, []);
-
-    const handleActivate = React.useCallback(() => {
-        setActive(true);
-    }, []);
-
-    const handleUnactivate = React.useCallback(() => {
-        setActive(false);
-    }, []);
-
-    return <div tabIndex={-1}
-        className={clsx(classes.listButton,
-            isActive && classes.listButtonActive)}
-        onTouchStart={handleHoverIn}
-        onTouchEnd={handleHoverOut}
-        onFocus={handleActivate}
-        onBlur={handleUnactivate}>
-        <div className={clsx(classes.contentBox,
-            isHovered && classes.contentBoxHover)}>
-            {children}
-        </div>
-        {isActive &&
-            <div className={classes.outlineBox} ref={outlineRef}/>
-        }
-    </div>
+    </Control>
+    
 }

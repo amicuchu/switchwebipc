@@ -2,7 +2,11 @@ import React from "react"
 import {createUseStyles} from "react-jss"
 
 import CommandBar from "./CommandBar"
+import OneAxisLayout from "./OneAxisLayout"
 import ListButton from "./ListButton"
+import {ActionContextProvider, Action} from "./Contexts/Actions"
+import { AnimationContextProvide as AnimationContextProvider } from "./Contexts/Animation"
+import { HIDButtonBitField } from "./WebIPCHID"
 
 const useStyles = createUseStyles({
     appContainer: {
@@ -18,13 +22,22 @@ const useStyles = createUseStyles({
 
 export default function App(){
     const classes = useStyles();
-    return <div className={classes.appContainer}>
-        <div className={classes.contentContainer}>
-            <ListButton>Hello world</ListButton>
-            <ListButton>Hello world</ListButton>
-            <ListButton>Hello world</ListButton>
-            <ListButton>Hello world</ListButton>
-        </div>
-        <CommandBar/>
-    </div>
+    
+    const [focusedRow, setFocusedRow] = React.useState();
+
+    return <ActionContextProvider>
+        <AnimationContextProvider>
+            <div className={classes.appContainer}>
+                <div className={classes.contentContainer}>
+                    <OneAxisLayout>
+                        <ListButton>Hello world</ListButton>
+                        <ListButton>Hello world</ListButton>
+                        <ListButton actionMap={new Map([[HIDButtonBitField.X, new Action(HIDButtonBitField.X, "Purge", ()=>{})]])}>Hello world</ListButton>
+                        <ListButton>Hello world</ListButton>
+                    </OneAxisLayout>
+                </div>
+                <CommandBar/>
+            </div>
+        </AnimationContextProvider>
+    </ActionContextProvider>
 }
