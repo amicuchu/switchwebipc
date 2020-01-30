@@ -47107,8 +47107,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 /* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Contexts/Animation */ "./src/Contexts/Animation.tsx");
-/* harmony import */ var _Screens_TestMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Screens/TestMenu */ "./src/Screens/TestMenu.tsx");
+/* harmony import */ var _Sections_TestMenu__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Sections/TestMenu */ "./src/Sections/TestMenu.tsx");
 /* harmony import */ var _Transition__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Transition */ "./src/Transition.tsx");
+/* harmony import */ var _Screens_TestButtons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Screens/TestButtons */ "./src/Screens/TestButtons.tsx");
+/* harmony import */ var _Screens_FramedScreen__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Screens/FramedScreen */ "./src/Screens/FramedScreen.tsx");
+/* harmony import */ var _Sections_TestJoysticks__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Sections/TestJoysticks */ "./src/Sections/TestJoysticks.tsx");
+
+
+
 
 
 
@@ -47132,13 +47138,12 @@ function App() {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_3__["AnimationContextProvide"], null,
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["MemoryRouter"], null,
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.appContainer },
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], { exact: true, path: "/" }, (routeProps) => {
-                    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: routeProps.match != null },
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screens_TestMenu__WEBPACK_IMPORTED_MODULE_4__["default"], null));
-                }),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screens_FramedScreen__WEBPACK_IMPORTED_MODULE_7__["default"], null,
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestMenu__WEBPACK_IMPORTED_MODULE_4__["default"], { path: "/", headerName: "Test menu" }),
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestJoysticks__WEBPACK_IMPORTED_MODULE_8__["default"], { path: "/settings/joysticksTest", headerName: "Joysticks" })),
                 react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], { path: "/settings/buttonTest" }, (routeProps) => {
                     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: routeProps.match != null },
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", null, "Hello"));
+                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screens_TestButtons__WEBPACK_IMPORTED_MODULE_6__["default"], null));
                 }))));
 }
 
@@ -47377,7 +47382,8 @@ class ActionManager {
 }
 const ActionContext = react__WEBPACK_IMPORTED_MODULE_0___default.a.createContext(null);
 function ActionContextProvider({ children }) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ActionContext.Provider, { value: new ActionManager() }, children);
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef(new ActionManager());
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ActionContext.Provider, { value: actionManager.current }, children);
 }
 
 
@@ -47547,13 +47553,14 @@ function Control(props) {
     const [lastTouchCancelEvent, setLastTouchCancelEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
     const directlyActivable = props.directlyActivable !== undefined ? props.directlyActivable : true;
     const handleActivate = props.onActivate !== undefined ? props.onActivate : () => { };
+    const isFocused = focusProps ? focusProps.focused : false;
     //Notify focusability
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
-        focusProps.notifyFocusability(true);
+        if (focusProps)
+            focusProps.notifyFocusability(true);
     }, []);
-    const handleHIDButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((evP) => {
+    const handleHIDButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((ev) => {
         //Webkit makes custom events not have prototype, migrate from plane object
-        const ev = _WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonEvent"].clonePlaneObject(evP);
         if (props.onHIDButton) {
             props.onHIDButton(ev);
             return;
@@ -47612,7 +47619,6 @@ function Control(props) {
         if (lastTouchEndEvent) {
             setIsTouched(false);
             const touch = lastTouchEndEvent.changedTouches[0];
-            console.log(lastTouchEndEvent);
             if (document.elementsFromPoint(touch.clientX, touch.clientY).indexOf(ref.current) !== -1) {
                 if (!directlyActivable) {
                     focusProps.grabFocus();
@@ -47633,10 +47639,12 @@ function Control(props) {
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (ref.current && !ref.current["hooked"]) {
             //handleGamepadKey is a stale closure, methods from layout must use state in function form
-            ref.current.addEventListener("hidButtonEvent", (ev) => {
-                setLastHIDButtonEvent(ev);
-                ev.stopPropagation();
-            });
+            if (navigationProps) {
+                ref.current.addEventListener("hidButtonEvent", (ev) => {
+                    setLastHIDButtonEvent(ev.detail);
+                    ev.stopPropagation();
+                });
+            }
             ref.current.addEventListener("touchstart", (ev) => {
                 setLastTouchStartEvent(ev);
                 if (!directlyActivable)
@@ -47662,8 +47670,8 @@ function Control(props) {
     }
     //Focus effect
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
-        if (ref.current) {
-            if (focusProps.focused) {
+        if (ref.current && actionManager) {
+            if (isFocused) {
                 ref.current.focus();
                 if (!ref.current["actionsHooked"]) {
                     actionManager.addActionMapOverlay(actionMap, ref.current);
@@ -47677,8 +47685,148 @@ function Control(props) {
                 }
             }
         }
-    }, [ref.current, focusProps.focused]);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, props.children({ reference: ref, isFocused: focusProps.focused, isTouched }));
+    }, [ref.current, isFocused]);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, props.children({ reference: ref, isFocused, isTouched }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Controls/Button.tsx":
+/*!*********************************!*\
+  !*** ./src/Controls/Button.tsx ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Button; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+/* harmony import */ var _Control__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Control */ "./src/Control.tsx");
+/* harmony import */ var _OutlineBox__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../OutlineBox */ "./src/OutlineBox.tsx");
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    button: {
+        position: "relative",
+        border: "solid 2px black",
+        borderRadius: 5,
+        outline: "none"
+    },
+    buttonActive: {
+        backgroundColor: "#fdfdfd"
+    },
+    contentBox: {
+        width: "100%",
+        padding: "20px 0px",
+        textAlign: "center"
+    },
+    contentBoxHover: {
+        backgroundColor: "#00f5ff17"
+    },
+    outlineBox: {
+        position: "absolute",
+        top: "0px",
+        height: "100%",
+        width: "100%",
+        border: "4px solid",
+        margin: "-2px",
+        borderRadius: "4px",
+        borderColor: "#59fcdd",
+        boxShadow: "0px 1px 3px 0px #06bcc7",
+        zIndex: 1
+    }
+});
+function Button(props) {
+    const classes = useStyles();
+    const className = props.className ? props.className : null;
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Control__WEBPACK_IMPORTED_MODULE_3__["Control"], { actionMap: props.actionMap, onActivate: props.onActivate }, ({ reference, isFocused, isTouched }) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: reference, className: Object(clsx__WEBPACK_IMPORTED_MODULE_2__["default"])(className, classes.button, isFocused && classes.buttonActive) },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: Object(clsx__WEBPACK_IMPORTED_MODULE_2__["default"])(classes.contentBox, isTouched && classes.contentBoxHover) }, props.children),
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_OutlineBox__WEBPACK_IMPORTED_MODULE_4__["default"], { visible: isFocused })));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icon.tsx":
+/*!**********************!*\
+  !*** ./src/Icon.tsx ***!
+  \**********************/
+/*! exports provided: IconButtonMap, Icon */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IconButtonMap", function() { return IconButtonMap; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Icon", function() { return Icon; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
+/* harmony import */ var _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Icons/ButtonA */ "./src/Icons/ButtonA.tsx");
+/* harmony import */ var _Icons_ButtonB__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Icons/ButtonB */ "./src/Icons/ButtonB.tsx");
+/* harmony import */ var _Icons_ButtonY__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Icons/ButtonY */ "./src/Icons/ButtonY.tsx");
+/* harmony import */ var _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Icons/ButtonX */ "./src/Icons/ButtonX.tsx");
+/* harmony import */ var _Icons_ButtonMinus__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Icons/ButtonMinus */ "./src/Icons/ButtonMinus.tsx");
+/* harmony import */ var _Icons_ButtonPlus__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Icons/ButtonPlus */ "./src/Icons/ButtonPlus.tsx");
+/* harmony import */ var _Icons_LStick__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Icons/LStick */ "./src/Icons/LStick.tsx");
+/* harmony import */ var _Icons_RStick__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Icons/RStick */ "./src/Icons/RStick.tsx");
+/* harmony import */ var _Icons_ButtonL__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Icons/ButtonL */ "./src/Icons/ButtonL.tsx");
+/* harmony import */ var _Icons_ButtonR__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./Icons/ButtonR */ "./src/Icons/ButtonR.tsx");
+/* harmony import */ var _Icons_ButtonZL__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Icons/ButtonZL */ "./src/Icons/ButtonZL.tsx");
+/* harmony import */ var _Icons_ButtonZR__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Icons/ButtonZR */ "./src/Icons/ButtonZR.tsx");
+/* harmony import */ var _Icons_LeftPad__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./Icons/LeftPad */ "./src/Icons/LeftPad.tsx");
+/* harmony import */ var _Icons_RightPad__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./Icons/RightPad */ "./src/Icons/RightPad.tsx");
+/* harmony import */ var _Icons_UpPad__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./Icons/UpPad */ "./src/Icons/UpPad.tsx");
+/* harmony import */ var _Icons_DownPad__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./Icons/DownPad */ "./src/Icons/DownPad.tsx");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const IconButtonMap = new Map([
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].A, _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_2__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].B, _Icons_ButtonB__WEBPACK_IMPORTED_MODULE_3__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].Y, _Icons_ButtonY__WEBPACK_IMPORTED_MODULE_4__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].X, _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_5__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].LeftStick, _Icons_LStick__WEBPACK_IMPORTED_MODULE_8__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].RightSitck, _Icons_RStick__WEBPACK_IMPORTED_MODULE_9__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].L, _Icons_ButtonL__WEBPACK_IMPORTED_MODULE_10__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].R, _Icons_ButtonR__WEBPACK_IMPORTED_MODULE_11__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].ZL, _Icons_ButtonZL__WEBPACK_IMPORTED_MODULE_12__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].ZR, _Icons_ButtonZR__WEBPACK_IMPORTED_MODULE_13__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].Plus, _Icons_ButtonPlus__WEBPACK_IMPORTED_MODULE_7__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].Minus, _Icons_ButtonMinus__WEBPACK_IMPORTED_MODULE_6__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].LeftPad, _Icons_LeftPad__WEBPACK_IMPORTED_MODULE_14__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].UpPad, _Icons_UpPad__WEBPACK_IMPORTED_MODULE_16__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].RightPad, _Icons_RightPad__WEBPACK_IMPORTED_MODULE_15__["default"]],
+    [_WebIPCHID__WEBPACK_IMPORTED_MODULE_1__["HIDButtonBitField"].DownPad, _Icons_DownPad__WEBPACK_IMPORTED_MODULE_17__["default"]]
+]);
+function Icon(props) {
+    const size = props.size ? props.size : 26;
+    const classname = props.className ? props.className : null;
+    const viewBox = props.viewBox ? props.viewBox : "0 0 1024 1024";
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", { className: classname, viewBox: viewBox, height: size, width: size },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("path", { d: props.svgPath }));
 }
 
 
@@ -47696,10 +47844,121 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonA; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
 
-function ButtonA() {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", { viewBox: "0 0 1024 1024", height: "26", width: "26" },
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("path", { d: "m 514.95835,341.57072 81,204 h -162 z m 187,-279.5 c 59.33333,25.666671 111,60.5 155,104.5 44,44 78.83333,95.6667 104.5,155 25.66667,59.3333 38.5,122.6667 38.5,190 0,67.3333 -12.83333,130.16669 -38.5,188.49999 -25.66667,58.3333 -60.5,109.33335 -104.5,153.00005 -44,43.6667 -95.66667,78 -155,103 -59.33333,25 -122.66667,37.5 -190,37.5 -67.33333,0 -130.66667,-12.5 -190,-37.5 -59.33333,-25 -111,-59.3333 -155,-103 -44,-43.6667 -78.833322,-94.66675 -104.499992,-153.00005 -25.66667,-58.3333 -38.5,-121.16669 -38.5,-188.49999 0,-67.3333 12.83333,-130.6667 38.5,-190 25.66667,-59.3333 60.499992,-111 104.499992,-155 44,-44 95.66667,-78.833329 155,-104.5 59.33333,-25.66667 122.66667,-38.5 190,-38.5 67.33333,0 130.66667,12.83333 190,38.5 z m -153,171.5 h -73 l -219,509.99999 h 95 l 50,-120.99999 h 225 l 50,120.99999 h 94 z" }));
+
+function ButtonA(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 514.95835,341.57072 81,204 h -162 z m 187,-279.5 c 59.33333,25.666671 111,60.5 155,104.5 44,44 78.83333,95.6667 104.5,155 25.66667,59.3333 38.5,122.6667 38.5,190 0,67.3333 -12.83333,130.16669 -38.5,188.49999 -25.66667,58.3333 -60.5,109.33335 -104.5,153.00005 -44,43.6667 -95.66667,78 -155,103 -59.33333,25 -122.66667,37.5 -190,37.5 -67.33333,0 -130.66667,-12.5 -190,-37.5 -59.33333,-25 -111,-59.3333 -155,-103 -44,-43.6667 -78.833322,-94.66675 -104.499992,-153.00005 -25.66667,-58.3333 -38.5,-121.16669 -38.5,-188.49999 0,-67.3333 12.83333,-130.6667 38.5,-190 25.66667,-59.3333 60.499992,-111 104.499992,-155 44,-44 95.66667,-78.833329 155,-104.5 59.33333,-25.66667 122.66667,-38.5 190,-38.5 67.33333,0 130.66667,12.83333 190,38.5 z m -153,171.5 h -73 l -219,509.99999 h 95 l 50,-120.99999 h 225 l 50,120.99999 h 94 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonB.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/ButtonB.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonB; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonB(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 604,401.57192 q 0,33 -24,51.5 -24,18.5 -66,18.5 h -83 v -137 h 72 q 101,0 101,67 z m -94,297 h -79 v -153 h 86 q 109,0 109,76 0,25 -12,40 -12,15 -29.5,23.5 -17.5,8.5 -38,11 -20.5,2.5 -36.5,2.5 z m 2,-671.000004 q 101,0 190,38.5 89,38.500004 155,104.500004 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 -38.5,87.5 -104.5,153 -66,65.5 -155,103 -89,37.49998 -190,37.49998 -101,0 -190,-37.49998 -89,-37.5 -155,-103 -66,-65.5 -104.5,-153 -38.5,-87.5 -38.5,-188.5 0,-101 38.5,-190 38.5,-89 104.5,-155 66,-66 155,-104.500004 89,-38.5 190,-38.5 z M 525,261.57192 H 346 v 512 h 171 q 91,0 143,-40 52,-40 52,-109 0,-46 -24.5,-78.5 -24.5,-32.5 -67.5,-44.5 32,-15 50,-43.5 18,-28.5 18,-63.5 0,-46 -20,-73 -20,-27 -47,-40 -27,-13 -54.5,-16.5 -27.5,-3.5 -41.5,-3.5 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonL.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/ButtonL.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonL; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonL(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "M 681,695 H 454 V 250 H 368 V 774 H 681 Z M 1005,78 q 4,0 4,5 v 857 q 0,5 -4,5 H 20 q -5,0 -5,-5 V 371 q 0,-61 23,-114 23,-53 62.5,-93 39.5,-40 93,-63 Q 247,78 307,78 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonMinus.tsx":
+/*!***********************************!*\
+  !*** ./src/Icons/ButtonMinus.tsx ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonMinus; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonMinus(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,32 q 99,0 186.5,37.5 87.5,37.5 153,103 65.5,65.5 103,153 Q 992,413 992,512 992,611 954.5,697.5 917,784 851.5,848 786,912 698.5,949 611,986 512,986 413,986 325.5,949 238,912 172.5,848 107,784 69.5,697.5 32,611 32,512 32,413 69.5,325.5 107,238 172.5,172.5 238,107 325.5,69.5 413,32 512,32 Z m 250,527 v -92 q 0,-5 -5,-5 H 267 q -5,0 -5,5 v 92 q 0,5 5,5 h 490 q 5,0 5,-5 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonPlus.tsx":
+/*!**********************************!*\
+  !*** ./src/Icons/ButtonPlus.tsx ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonPlus; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonPlus(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,32 q 99,0 186.5,37.5 87.5,37.5 153,103 65.5,65.5 103,153 Q 992,413 992,512 992,611 954.5,697.5 917,784 851.5,848 786,912 698.5,949 611,986 512,986 413,986 325.5,949 238,912 172.5,848 107,784 69.5,697.5 32,611 32,512 32,413 69.5,325.5 107,238 172.5,172.5 238,107 325.5,69.5 413,32 512,32 Z m 250,525 v -91 q 0,-5 -5,-5 H 568 q -5,0 -5,-5 V 266 q 0,-4 -5,-4 h -92 q -5,0 -5,4 v 190 q 0,5 -5,5 H 267 q -5,0 -5,5 v 91 q 0,5 5,5 h 189 q 5,0 5,5 v 191 q 0,4 5,4 h 92 q 5,0 5,-4 V 567 q 0,-5 5,-5 h 189 q 5,0 5,-5 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonR.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/ButtonR.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonR; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonR(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "M 482,473 H 407 V 326 h 79 q 18,0 37,3 19,3 34.5,11 15.5,8 25.5,22.5 10,14.5 10,36.5 0,74 -111,74 z m 527,-102 v 569 q 0,5 -4,5 H 20 q -5,0 -5,-5 V 83 q 0,-5 5,-5 h 697 q 60,0 113.5,23 53.5,23 93,63 39.5,40 62.5,93 23,53 23,114 z M 705,774 561,538 Q 618,526 649,489.5 680,453 680,399 680,351 660.5,321.5 641,292 612.5,276 584,260 551,255 518,250 492,250 H 327 v 524 h 80 V 548 h 64 l 129,226 z" }));
 }
 
 
@@ -47717,10 +47976,297 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonX; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
 
-function ButtonX() {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("svg", { viewBox: "0 0 1024 1024", height: "26", width: "26" },
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("path", { d: "m 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 Q 923,788 857,853.5 791,919 702,956.5 613,994 512,994 411,994 322,956.5 233,919 167,853.5 101,788 62.5,700.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z M 459,497 277,767 H 381 L 510,565 641,767 H 747 L 562,499 725,257 H 626 L 512,435 398,257 H 294 Z" }));
+
+function ButtonX(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 Q 923,788 857,853.5 791,919 702,956.5 613,994 512,994 411,994 322,956.5 233,919 167,853.5 101,788 62.5,700.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z M 459,497 277,767 H 381 L 510,565 641,767 H 747 L 562,499 725,257 H 626 L 512,435 398,257 H 294 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonY.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/ButtonY.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonY; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonY(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 Q 923,788 857,853.5 791,919 702,956.5 613,994 512,994 411,994 322,956.5 233,919 167,853.5 101,788 62.5,700.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z M 272,258 467,554 v 222 h 90 V 554 L 752,258 H 647 L 514,473 382,258 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonZL.tsx":
+/*!********************************!*\
+  !*** ./src/Icons/ButtonZL.tsx ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonZL; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonZL(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "M 806,686 H 657 V 394 H 590 V 748 H 806 Z M 530,679 H 315 L 527,396 V 335 H 222 v 68 h 208 l -210,281 -2,2 v 62 H 530 Z M 785,19 q 45,0 85,17.5 40,17.5 70,47.5 30,30 47.5,70 17.5,40 17.5,85 v 764 H 20 V 507 Q 20,440 37.5,377.5 55,315 86.5,261 118,207 162.5,162.5 207,118 261,86 315,54 377.5,36.5 440,19 507,19 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/ButtonZR.tsx":
+/*!********************************!*\
+  !*** ./src/Icons/ButtonZR.tsx ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonZR; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function ButtonZR(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 679,454 q 65,0 65,43 0,5 -1,12.5 -1,7.5 -9,15.5 -7,6 -20.5,11 -13.5,5 -37.5,5 h -44 v -87 z m 57,138 q 29,-8 50,-29 25,-27 25,-66 0,-49 -33.5,-76 Q 744,394 683,394 H 566 v 1 h -1 v 353 h 67 V 600 h 34 l 85,148 h 80 z M 492,679 H 277 L 489,397 V 335 H 185 v 1 68 H 392 L 180,686 v 62 h 312 v -1 z M 517,19 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 v 496 H 20 V 239 Q 20,194 37,154 54,114 84,84 114,54 154,36.5 194,19 239,19 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/DownPad.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/DownPad.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return DownPad; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function DownPad(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 814,403 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 42,-8.5 20,-8.5 34.5,-23 14.5,-14.5 23,-34 Q 922,532 922,510 922,488 913.5,468.5 905,449 890.5,434.5 876,420 856,411.5 836,403 814,403 Z m 0,-69 q 36,0 68,14 32,14 56,38 24,24 38,56 14,32 14,68 0,36 -14,68 -14,32 -38,56 -24,24 -56,38 -32,14 -68,14 -36,0 -68,-14 -32,-14 -56,-38 -24,-24 -37.5,-56 -13.5,-32 -13.5,-68 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-38 32,-14 68,-14 z M 405,208 q 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 619,230 619,208 619,186 610.5,166.5 602,147 587.5,132.5 573,118 553.5,109.5 534,101 512,101 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 Q 405,186 405,208 Z m -68,0 q 0,-36 13.5,-68 Q 364,108 388,84.5 412,61 444,47 q 32,-14 68,-14 36,0 68,14 32,14 56,37.5 24,23.5 38,55.5 14,32 14,68 0,36 -14,68 -14,32 -38,56 -24,24 -56,37.5 Q 548,383 512,383 476,383 444,369.5 412,356 388,332 364,308 350.5,276 337,244 337,208 Z M 210,617 q 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 317,532 317,510 317,488 308.5,468.5 300,449 285.5,434.5 271,420 251.5,411.5 232,403 210,403 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 z m 0,69 Q 174,686 142,672 110,658 86,634 62,610 48,578 34,546 34,510 q 0,-36 14,-68 14,-32 38,-56 24,-24 56,-38 32,-14 68,-14 36,0 68,14 32,14 56,38 24,24 37.5,56 13.5,32 13.5,68 0,36 -13.5,68 -13.5,32 -37.5,56 -24,24 -56,38 -32,14 -68,14 z m 489,135 q 0,39 -14.5,72.5 -14.5,33.5 -40,59 -25.5,25.5 -59.5,40 -34,14.5 -73,14.5 -39,0 -73,-14.5 Q 405,978 379.5,952.5 354,927 339.5,893.5 325,860 325,821 q 0,-39 14.5,-73 14.5,-34 40,-59.5 25.5,-25.5 59.5,-40 34,-14.5 73,-14.5 39,0 73,14.5 34,14.5 59.5,40 25.5,25.5 40,59.5 14.5,34 14.5,73 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/Home.tsx":
+/*!****************************!*\
+  !*** ./src/Icons/Home.tsx ***!
+  \****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Home; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function Home(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 594,615 q 0,-29 0.5,-54 0.5,-25 -0.5,-54 0,-18 -19,-18 H 449 q -19,0 -19,19 v 107 q 0,19 19,19 h 126 q 19,0 19,-19 z M 524,198 806,437 q 13,11 8.5,22.5 Q 810,471 793,471 h -36 q -19,0 -19,19 v 244 q 0,19 -19,19 H 305 q -19,0 -19,-19 V 490 q 0,-19 -19,-19 H 231 Q 214,471 209.5,459.5 205,448 218,437 L 500,198 q 12,-9 24,0 z M 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,189.5 Q 923,790 857,856 791,922 702,960 613,998 512,998 411,998 322,960 233,922 167,856 101,790 62.5,701.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z m 0,896 q 85,0 159.5,-32 74.5,-32 130,-87 55.5,-55 88,-129.5 Q 922,597 922,512 922,427 889.5,352.5 857,278 801.5,222.5 746,167 671.5,134.5 597,102 512,102 427,102 352.5,134.5 278,167 222.5,222.5 167,278 134.5,352.5 102,427 102,512 q 0,85 32.5,159.5 32.5,74.5 88,129.5 55.5,55 130,87 74.5,32 159.5,32 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/LStick.tsx":
+/*!******************************!*\
+  !*** ./src/Icons/LStick.tsx ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LStick; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function LStick(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,5 q 94,0 184.5,32.5 90.5,32.5 161,93.5 70.5,61 114,147 43.5,86 43.5,192 0,138 -40,237.5 -40,99.5 -108.5,163 -68.5,63.5 -160,94 Q 615,995 512,995 409,995 318,964.5 227,934 158.5,870.5 90,807 50,707.5 10,608 10,470 10,364 53,278 96,192 166.5,131 237,70 327,37.5 417,5 512,5 Z m 0,865 q 92,0 173,-31.5 Q 766,807 826,752 886,697 921,623.5 956,550 956,467 956,383 921,309.5 886,236 826,181.5 766,127 685,95 604,63 512,63 420,63 339,95 258,127 198,181.5 138,236 103,309.5 68,383 68,467 q 0,83 35,156.5 35,73.5 95,128.5 60,55 141,86.5 81,31.5 173,31.5 z m -3,-469 h -44 v -86 h 47 q 64,0 64,42 0,4 -1,11.5 -1,7.5 -7.5,14.5 -6.5,7 -20,12.5 Q 534,401 509,401 Z m 3,-295 q 76,0 142.5,26.5 66.5,26.5 116,72 49.5,45.5 78,106.5 28.5,61 28.5,130 0,69 -28.5,130 -28.5,61 -78,106.5 -49.5,45.5 -116,72 Q 588,776 512,776 437,776 370.5,749.5 304,723 254.5,677.5 205,632 176,571 147,510 147,441 147,372 176,311 205,250 254.5,204.5 304,159 370.5,132.5 437,106 512,106 Z m 3,150 H 400 v 350 h 65 V 459 h 34 l 84,147 h 79 L 568,451 Q 603,441 622.5,416.5 642,392 642,357 642,309 609,282.5 576,256 515,256 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/LeftPad.tsx":
+/*!*******************************!*\
+  !*** ./src/Icons/LeftPad.tsx ***!
+  \*******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LeftPad; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function LeftPad(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 401,210 q 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 615,232 615,210 615,188 606.5,168.5 598,149 583.5,134 569,119 549.5,110.5 530,102 508,102 q -22,0 -41.5,8.5 -19.5,8.5 -34,23.5 -14.5,15 -23,34.5 Q 401,188 401,210 Z m -69,0 q 0,-36 14,-68 14,-32 38,-56 24,-24 56,-38 32,-14 68,-14 36,0 68,14 32,14 56,38 24,24 37.5,56 13.5,32 13.5,68 0,36 -13.5,68 Q 656,310 632,334 608,358 576,371.5 544,385 508,385 472,385 440,371.5 408,358 384,334 360,310 346,278 332,246 332,210 Z m 283,604 q 0,-22 -8.5,-41.5 -8.5,-19.5 -23,-34 Q 569,724 549.5,715.5 530,707 508,707 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41 8.5,19 23,33.5 14.5,14.5 34,22.5 19.5,8 41.5,8 22,0 41.5,-8 19.5,-8 34,-22.5 14.5,-14.5 23,-33.5 8.5,-19 8.5,-41 z m 68,0 q 0,35 -13.5,66.5 -13.5,31.5 -37.5,55 -24,23.5 -56,37.5 -32,14 -68,14 -36,0 -68,-14 -32,-14 -56,-37.5 -24,-23.5 -38,-55 -14,-31.5 -14,-66.5 0,-36 14,-68 14,-32 38,-56 24,-24 56,-37.5 32,-13.5 68,-13.5 36,0 68,13.5 32,13.5 56,37.5 24,24 37.5,56 13.5,32 13.5,68 z M 810,405 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 917,534 917,512 917,490 908.5,470.5 900,451 885.5,436.5 871,422 851.5,413.5 832,405 810,405 Z m 0,-69 q 36,0 68,14 32,14 56,38 24,24 38,56 14,32 14,68 0,36 -14,68 -14,32 -38,56 -24,24 -56,38 -32,14 -68,14 -36,0 -68,-14 -32,-14 -56,-38 -24,-24 -37.5,-56 -13.5,-32 -13.5,-68 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-38 32,-14 68,-14 z M 197,317 q 40,0 75.5,15.5 35.5,15.5 62,41.5 26.5,26 42,62 15.5,36 15.5,76 0,41 -15.5,76.5 Q 361,624 334.5,650 308,676 272.5,691.5 237,707 197,707 156,707 120.5,691.5 85,676 58.5,650 32,624 16.5,588.5 1,553 1,512 1,472 16.5,436 32,400 58.5,374 85,348 120.5,332.5 156,317 197,317 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/PressedArrow.tsx":
+/*!************************************!*\
+  !*** ./src/Icons/PressedArrow.tsx ***!
+  \************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PressedArrow; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function PressedArrow(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { viewBox: "0 0 650 460", svgPath: "M 441.09338,19.539578 V 176.53958 h 189 c 2.66667,0 4.33333,1.33333 5,4 0.66667,2.66667 0,4.66667 -2,6 l -307,258 c -1.44355,1.21315 -2.40372,2.29814 -3,2 l -4,-2 -307.000002,-258 c -2,-1.33333 -2.5000001,-3.33333 -1.5,-6 1,-2.66667 2.83333,-4 5.5,-4 H 200.09338 V 19.539578 c 0,-3.33333 1.66667,-5 5,-5 h 230 c 4,0 6,1.66667 6,5 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/RStick.tsx":
+/*!******************************!*\
+  !*** ./src/Icons/RStick.tsx ***!
+  \******************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RStick; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function RStick(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,5 q 94,0 184.5,32.5 90.5,32.5 161,93.5 70.5,61 114,147 43.5,86 43.5,192 0,138 -40,237.5 -40,99.5 -108.5,163 -68.5,63.5 -160,94 Q 615,995 512,995 409,995 318,964.5 227,934 158.5,870.5 90,807 50,707.5 10,608 10,470 10,364 53,278 96,192 166.5,131 237,70 327,37.5 417,5 512,5 Z m 0,865 q 92,0 173,-31.5 Q 766,807 826,752 886,697 921,623.5 956,550 956,467 956,383 921,309.5 886,236 826,181.5 766,127 685,95 604,63 512,63 420,63 339,95 258,127 198,181.5 138,236 103,309.5 68,383 68,467 q 0,83 35,156.5 35,73.5 95,128.5 60,55 141,86.5 81,31.5 173,31.5 z m -3,-469 h -44 v -86 h 47 q 64,0 64,42 0,4 -1,11.5 -1,7.5 -7.5,14.5 -6.5,7 -20,12.5 Q 534,401 509,401 Z m 3,-295 q 76,0 142.5,26.5 66.5,26.5 116,72 49.5,45.5 78,106.5 28.5,61 28.5,130 0,69 -28.5,130 -28.5,61 -78,106.5 -49.5,45.5 -116,72 Q 588,776 512,776 437,776 370.5,749.5 304,723 254.5,677.5 205,632 176,571 147,510 147,441 147,372 176,311 205,250 254.5,204.5 304,159 370.5,132.5 437,106 512,106 Z m 3,150 H 400 v 350 h 65 V 459 h 34 l 84,147 h 79 L 568,451 Q 603,441 622.5,416.5 642,392 642,357 642,309 609,282.5 576,256 515,256 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/RightPad.tsx":
+/*!********************************!*\
+  !*** ./src/Icons/RightPad.tsx ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RightPad; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function RightPad(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 823,317 q 40,0 76,15.5 36,15.5 62.5,41.5 26.5,26 42,62 15.5,36 15.5,76 0,41 -15.5,76.5 Q 988,624 961.5,650 935,676 899,691.5 863,707 823,707 783,707 747.5,691.5 712,676 685.5,650 659,624 643.5,588.5 628,553 628,512 q 0,-40 15.5,-76 15.5,-36 42,-62 26.5,-26 62,-41.5 Q 783,317 823,317 Z m -613,19 q 36,0 68,14 32,14 56,38 24,24 37.5,56 13.5,32 13.5,68 0,36 -13.5,68 -13.5,32 -37.5,56 -24,24 -56,38 -32,14 -68,14 -36,0 -68,-14 Q 110,660 86,636 62,612 48,580 34,548 34,512 q 0,-36 14,-68 14,-32 38,-56 24,-24 56,-38 32,-14 68,-14 z m 0,69 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 317,534 317,512 317,490 308.5,470.5 300,451 285.5,436.5 271,422 251.5,413.5 232,405 210,405 Z m 127,409 q 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-37.5 32,-13.5 68,-13.5 36,0 68,13.5 32,13.5 56,37.5 24,24 38,56 14,32 14,68 0,35 -14,66.5 -14,31.5 -38,55 -24,23.5 -56,37.5 -32,14 -68,14 -36,0 -68,-14 Q 412,959 388,935.5 364,912 350.5,880.5 337,849 337,814 Z m 68,0 q 0,22 8.5,41 8.5,19 23,33.5 14.5,14.5 34,22.5 19.5,8 41.5,8 22,0 41.5,-8 19.5,-8 34,-22.5 14.5,-14.5 23,-33.5 8.5,-19 8.5,-41 0,-22 -8.5,-41.5 -8.5,-19.5 -23,-34 Q 573,724 553.5,715.5 534,707 512,707 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 Q 405,792 405,814 Z M 688,210 q 0,36 -14,68 -14,32 -38,56 -24,24 -56,37.5 Q 548,385 512,385 476,385 444,371.5 412,358 388,334 364,310 350.5,278 337,246 337,210 q 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-38 32,-14 68,-14 36,0 68,14 32,14 56,38 24,24 38,56 14,32 14,68 z m -69,0 q 0,-22 -8.5,-41.5 Q 602,149 587.5,134 573,119 553.5,110.5 534,102 512,102 q -22,0 -41.5,8.5 -19.5,8.5 -34,23.5 -14.5,15 -23,34.5 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 619,232 619,210 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/Screenshot.tsx":
+/*!**********************************!*\
+  !*** ./src/Icons/Screenshot.tsx ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Screenshot; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function Screenshot(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,195 q 66,0 123.5,25 57.5,25 100.5,68 43,43 68,100.5 25,57.5 25,123.5 0,66 -25,123.5 Q 779,693 736,736 693,779 635.5,804 578,829 512,829 446,829 388.5,804 331,779 288,736 245,693 220,635.5 195,578 195,512 195,446 220,388.5 245,331 288,288 331,245 388.5,220 446,195 512,195 Z m 0,69 q -51,0 -96.5,19.5 Q 370,303 336,336.5 302,370 282.5,415.5 263,461 263,512 q 0,51 19.5,96.5 Q 302,654 336,688 370,722 415.5,741.5 461,761 512,761 563,761 608.5,741.5 654,722 688,688 722,654 741.5,608.5 761,563 761,512 761,461 741.5,415.5 722,370 688,336.5 654,303 608.5,283.5 563,264 512,264 Z M 995,25 q 5,0 5,4 v 965 q 0,5 -5,5 H 29 q -5,0 -5,-5 V 29 q 0,-4 5,-4 z M 931,93 H 93 v 838 h 838 z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/Stick.tsx":
+/*!*****************************!*\
+  !*** ./src/Icons/Stick.tsx ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Stick; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function Stick(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,870 q 92,0 173,-31.5 Q 766,807 826,752 886,697 921,623.5 956,550 956,467 956,383 921,309.5 886,236 826,181.5 766,127 685,95 604,63 512,63 420,63 339,95 258,127 198,181.5 138,236 103,309.5 68,383 68,467 q 0,83 35,156.5 35,73.5 95,128.5 60,55 141,86.5 81,31.5 173,31.5 z M 512,5 Q 606,5 696.5,37.5 787,70 857.5,131 928,192 971,278 q 43,86 43,192 0,138 -40,240.5 Q 934,813 866,881.5 798,950 706.5,984 615,1018 512,1018 409,1018 318,984 227,950 158.5,881.5 90,813 50,710.5 10,608 10,470 10,364 53,278 96,192 166.5,131 237,70 327.5,37.5 418,5 512,5 Z m 0,722 q 65,0 122.5,-22.5 Q 692,682 735,643 778,604 803,552 828,500 828,441 828,382 803,330 778,278 735,239 692,200 634.5,177.5 577,155 512,155 447,155 389.5,177.5 332,200 289,239 q -43,39 -68,91 -25,52 -25,111 0,59 25,111 25,52 68,91 43,39 100.5,61.5 Q 447,727 512,727 Z m 0,-621 q 76,0 142.5,26.5 66.5,26.5 116,72 49.5,45.5 78,106.5 28.5,61 28.5,130 0,69 -28.5,130 -28.5,61 -78,106.5 -49.5,45.5 -116,72 Q 588,776 512,776 436,776 369.5,749.5 303,723 253.5,677.5 204,632 175.5,571 147,510 147,441 147,372 175.5,311 204,250 253.5,204.5 303,159 369.5,132.5 436,106 512,106 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/UpPad.tsx":
+/*!*****************************!*\
+  !*** ./src/Icons/UpPad.tsx ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UpPad; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function UpPad(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 699,201 q 0,39 -14.5,73 -14.5,34 -40,59.5 Q 619,359 585,373.5 551,388 512,388 473,388 439,373.5 405,359 379.5,333.5 354,308 339.5,274 325,240 325,201 325,162 339.5,128 354,94 379.5,68.5 405,43 439,28 q 34,-15 73,-15 39,0 73,15 34,15 59.5,40.5 25.5,25.5 40,59.5 14.5,34 14.5,73 z M 210,336 q 36,0 68,14 32,14 56,38 24,24 37.5,56 13.5,32 13.5,68 0,36 -13.5,68 -13.5,32 -37.5,56 -24,24 -56,38 -32,14 -68,14 -36,0 -68,-14 Q 110,660 86,636 62,612 48,580 34,548 34,512 q 0,-36 14,-68 14,-32 38,-56 24,-24 56,-38 32,-14 68,-14 z m 0,69 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 22,0 41.5,-8.5 19.5,-8.5 34,-23 14.5,-14.5 23,-34 Q 317,534 317,512 317,490 308.5,470.5 300,451 285.5,436.5 271,422 251.5,413.5 232,405 210,405 Z m 127,409 q 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-37.5 32,-13.5 68,-13.5 36,0 68,13.5 32,13.5 56,37.5 24,24 38,56 14,32 14,68 0,35 -14,66.5 -14,31.5 -38,55 -24,23.5 -56,37.5 -32,14 -68,14 -36,0 -68,-14 Q 412,959 388,935.5 364,912 350.5,880.5 337,849 337,814 Z m 68,0 q 0,22 8.5,41 8.5,19 23,33.5 14.5,14.5 34,22.5 19.5,8 41.5,8 22,0 41.5,-8 19.5,-8 34,-22.5 14.5,-14.5 23,-33.5 8.5,-19 8.5,-41 0,-22 -8.5,-41.5 -8.5,-19.5 -23,-34 Q 573,724 553.5,715.5 534,707 512,707 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 Q 405,792 405,814 Z M 814,688 q -36,0 -68,-14 -32,-14 -56,-38 -24,-24 -37.5,-56 -13.5,-32 -13.5,-68 0,-36 13.5,-68 13.5,-32 37.5,-56 24,-24 56,-38 32,-14 68,-14 36,0 68,14 32,14 56,38 24,24 38,56 14,32 14,68 0,36 -14,68 -14,32 -38,56 -24,24 -56,38 -32,14 -68,14 z m 0,-69 q 22,0 42,-8.5 20,-8.5 34.5,-23 14.5,-14.5 23,-34 Q 922,534 922,512 922,490 913.5,470.5 905,451 890.5,436.5 876,422 856,413.5 836,405 814,405 q -22,0 -41.5,8.5 -19.5,8.5 -34,23 -14.5,14.5 -23,34 -8.5,19.5 -8.5,41.5 0,22 8.5,41.5 8.5,19.5 23,34 14.5,14.5 34,23 19.5,8.5 41.5,8.5 z" }));
 }
 
 
@@ -47825,7 +48371,9 @@ const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles
         backgroundColor: "black"
     },
     mainContainer: {
-        flexGrow: 1
+        position: "relative",
+        flexGrow: 1,
+        height: 0
     }
 });
 function FramedLayout({ children, headerText }) {
@@ -47889,19 +48437,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return OneAxisLayout; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Contexts/Navigation */ "./src/Contexts/Navigation.tsx");
-/* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Layout */ "./src/Layout.tsx");
-/* harmony import */ var _Contexts_Focus__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Contexts/Focus */ "./src/Contexts/Focus.tsx");
-/* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Contexts/Animation */ "./src/Contexts/Animation.tsx");
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Contexts/Navigation */ "./src/Contexts/Navigation.tsx");
+/* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Layout */ "./src/Layout.tsx");
+/* harmony import */ var _Contexts_Focus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Contexts/Focus */ "./src/Contexts/Focus.tsx");
+/* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Contexts/Animation */ "./src/Contexts/Animation.tsx");
 
 
 
 
 
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    scrollArea: {
+        height: "100%",
+        overflowX: "hidden",
+        overflowY: "scroll",
+        scrollbarWidth: "none",
+        scrollBehavior: "smooth",
+        margin: "-15px -10px",
+        padding: "15px 10px",
+    }
+});
 function OneAxisLayout({ children, horizontal = false }) {
-    const parentNavProps = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_1__["NavigationContext"]);
-    const animationManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_4__["AnimationContext"]);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layout__WEBPACK_IMPORTED_MODULE_2__["Layout"], { initialFocusIndex: 0 }, (props) => {
+    const parentNavProps = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationContext"]);
+    const animationManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__["AnimationContext"]);
+    const classes = useStyles();
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layout__WEBPACK_IMPORTED_MODULE_3__["Layout"], { initialFocusIndex: 0 }, (props) => {
         const navigateBackwards = () => {
             console.log("navBack");
             let newFocusedRow = props.focusedIndex;
@@ -47927,13 +48489,13 @@ function OneAxisLayout({ children, horizontal = false }) {
             } while (!props.isFocusable(newFocusedRow));
             props.getFocusPropsForChild(newFocusedRow).grabFocus();
         };
-        const navProps = new _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_1__["NavigationProps"](parentNavProps, horizontal ?
+        const navProps = new _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationProps"](parentNavProps, horizontal ?
             { navigateLeft: navigateBackwards, navigateRight: navigateForwards } :
             { navigateUp: navigateBackwards, navigateDown: navigateForwards });
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child, index) => {
-            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_3__["FocusContext"].Provider, { value: props.getFocusPropsForChild(index) },
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_1__["NavigationContext"].Provider, { value: navProps }, child));
-        });
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.scrollArea }, react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child, index) => {
+            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_4__["FocusContext"].Provider, { value: props.getFocusPropsForChild(index) },
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationContext"].Provider, { value: navProps }, child));
+        }));
     });
 }
 
@@ -48119,17 +48681,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Contexts/Focus */ "./src/Contexts/Focus.tsx");
 
 
-function Screen({ children }) {
+function Screen(props) {
     const [isFocused, setIsFocused] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(true);
     const [lastTouchStartEv, setLastTouchStartEv] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
     const [lastHIDButtonEv, setLastHIDButtonEv] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
     const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const useFocusManager = props.useFocusManager === undefined ? true : props.useFocusManager;
     const grabFocus = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => setIsFocused(true), []);
     const notifyFocusability = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => { }, []);
-    const focusProps = new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](isFocused, grabFocus, notifyFocusability);
+    const focusProps = useFocusManager ? new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](isFocused, grabFocus, notifyFocusability) : null;
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         const handleHIDButton = (ev) => {
-            setLastHIDButtonEv(ev);
+            setLastHIDButtonEv(ev.detail);
         };
         document.addEventListener("hidButtonEvent", handleHIDButton, false);
         return () => {
@@ -48144,9 +48707,7 @@ function Screen({ children }) {
     }, [ref.current]);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (lastTouchStartEv) {
-            console.log("Screen Touch");
             setIsFocused(false);
-            console.log(lastTouchStartEv.eventPhase);
         }
     }, [lastTouchStartEv]);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
@@ -48154,16 +48715,238 @@ function Screen({ children }) {
             setIsFocused(true);
         }
     }, [lastHIDButtonEv]);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusContext"].Provider, { value: focusProps }, children({ reference: ref }));
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusContext"].Provider, { value: focusProps }, props.children({ reference: ref }));
 }
 
 
 /***/ }),
 
-/***/ "./src/Screens/TestMenu.tsx":
-/*!**********************************!*\
-  !*** ./src/Screens/TestMenu.tsx ***!
-  \**********************************/
+/***/ "./src/Screens/FramedScreen.tsx":
+/*!**************************************!*\
+  !*** ./src/Screens/FramedScreen.tsx ***!
+  \**************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FramedScreen; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var _Layouts_FramedLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Layouts/FramedLayout */ "./src/Layouts/FramedLayout.tsx");
+/* harmony import */ var _Screen__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Screen */ "./src/Screen.tsx");
+/* harmony import */ var _Transition__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Transition */ "./src/Transition.tsx");
+
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    eventLayer: {
+        width: "100%",
+        height: "100%"
+    }
+});
+function FramedScreen({ children }) {
+    let headerName = null;
+    const classes = useStyles();
+    console.log("Pre children");
+    const rchildren = react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child) => {
+        if (react__WEBPACK_IMPORTED_MODULE_0___default.a.isValidElement(child)) {
+            const match = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useRouteMatch"])({ path: child.props.path, exact: true });
+            if (match) {
+                headerName = child.props.headerName;
+            }
+            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: !!match, transition: "slide" }, react__WEBPACK_IMPORTED_MODULE_0___default.a.cloneElement(child, { match }));
+        }
+        else {
+            return child;
+        }
+    });
+    console.log("Post children");
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: !!headerName },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screen__WEBPACK_IMPORTED_MODULE_4__["Screen"], null, (props) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: props.reference, className: classes.eventLayer },
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_FramedLayout__WEBPACK_IMPORTED_MODULE_3__["default"], { headerText: headerName }, rchildren))));
+}
+
+
+/***/ }),
+
+/***/ "./src/Screens/TestButtons.tsx":
+/*!*************************************!*\
+  !*** ./src/Screens/TestButtons.tsx ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TestButtons; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var _Screen__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Screen */ "./src/Screen.tsx");
+/* harmony import */ var _Controls_Button__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Controls/Button */ "./src/Controls/Button.tsx");
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+/* harmony import */ var _Icons_Screenshot__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Icons/Screenshot */ "./src/Icons/Screenshot.tsx");
+/* harmony import */ var _Icons_Home__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Icons/Home */ "./src/Icons/Home.tsx");
+
+
+
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    eventLayer: {
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    subTitle: {
+        fontSize: 40
+    },
+    buttonIcon: {
+        fill: "#394dee",
+        margin: "0 20px"
+    },
+    buttonTestArea: {
+        height: 40,
+        width: 800,
+        borderBottom: "solid 3px #394dee",
+        paddingBottom: 10,
+        marginTop: 90,
+        marginBottom: 15,
+        outline: "none"
+    },
+    noteText: {
+        width: 640,
+        fontSize: 16,
+        textAlign: "center",
+        lineHeight: "25px",
+        color: "#7c7c7c"
+    },
+    exitButton: {
+        width: 355,
+        fontSize: 22,
+        marginTop: 60,
+        marginBottom: 40
+    }
+});
+function TestButtons() {
+    const classes = useStyles();
+    const history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useHistory"])();
+    const buttonAreaRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const [lastHIDButtonEvent, setLastHIDButtonEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
+    const [lastBlurEvent, setLastBlurEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(undefined);
+    const [buttonLog, setButtonLog] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState([]);
+    const [timeoutHandle, setTimeoutHandle] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
+    const handleExit = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        console.log("BlurOut");
+        //Doesn't matter if you aniquilate the handle, probably a onblur will be tiggered anyways
+        setLastBlurEvent(null);
+        history.goBack();
+    }, []);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (lastHIDButtonEvent) {
+            if (lastHIDButtonEvent.pressed) {
+                setButtonLog((buttonLog) => {
+                    const ret = buttonLog.slice();
+                    for (const button of lastHIDButtonEvent.getListOfButtons()) {
+                        ret.push(_Icon__WEBPACK_IMPORTED_MODULE_5__["IconButtonMap"].get(button));
+                    }
+                    while (ret.length > 10)
+                        ret.shift();
+                    return ret;
+                });
+                if (timeoutHandle == null)
+                    setTimeoutHandle(window.setTimeout(handleExit, 500));
+            }
+            else {
+                clearTimeout(timeoutHandle);
+                setTimeoutHandle(null);
+            }
+        }
+    }, [lastHIDButtonEvent]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (lastBlurEvent && lastBlurEvent !== null) {
+            buttonAreaRef.current.focus();
+        }
+    }, [lastBlurEvent]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (buttonAreaRef.current && !buttonAreaRef["tbHooked"]) {
+            buttonAreaRef.current.addEventListener("blur", (ev) => setLastBlurEvent((lastEv) => lastEv !== null ? ev : lastEv));
+            buttonAreaRef.current["tbHooked"] = true;
+            buttonAreaRef.current.focus();
+        }
+    }, [buttonAreaRef.current]);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screen__WEBPACK_IMPORTED_MODULE_3__["Screen"], { useFocusManager: false }, (props) => {
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (props.reference.current) {
+                if (!props.reference.current["tbHooked"]) {
+                    props.reference.current.addEventListener("hidButtonEvent", (ev) => {
+                        setLastHIDButtonEvent(ev.detail);
+                    });
+                    props.reference.current["tbHooked"] = true;
+                }
+            }
+        }, [props.reference.current]);
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null,
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: props.reference, className: classes.eventLayer },
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.subTitle }, "Aqu\u00ED se mostrar\u00E1 lo que pulses."),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: buttonAreaRef, className: classes.buttonTestArea, tabIndex: -1 }, buttonLog.map((item, index) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(item, { key: index, className: classes.buttonIcon, size: 40 }))),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.noteText },
+                    "No es posible comprobar el bot\u00F3n HOME(",
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Home__WEBPACK_IMPORTED_MODULE_7__["default"], { size: 16 }),
+                    "), el bot\u00F3n de captura(",
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Screenshot__WEBPACK_IMPORTED_MODULE_6__["default"], { size: 16 }),
+                    "), el bot\u00F3n POWER, los botones de volumen ni el bot\u00F3n SYNC."),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Controls_Button__WEBPACK_IMPORTED_MODULE_4__["default"], { className: classes.exitButton, onActivate: handleExit }, "Salir"),
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Mant\u00E9n pulsado cualquier bot\u00F3n para finalizar la prueba")));
+    });
+}
+
+
+/***/ }),
+
+/***/ "./src/Sections/TestJoysticks.tsx":
+/*!****************************************!*\
+  !*** ./src/Sections/TestJoysticks.tsx ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TestJoysticks; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icons_Stick__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icons/Stick */ "./src/Icons/Stick.tsx");
+/* harmony import */ var _Icons_PressedArrow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Icons/PressedArrow */ "./src/Icons/PressedArrow.tsx");
+
+
+
+function TestJoysticks(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null,
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Stick__WEBPACK_IMPORTED_MODULE_1__["default"], { size: 40 }),
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_PressedArrow__WEBPACK_IMPORTED_MODULE_2__["default"], { size: 40 }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Sections/TestMenu.tsx":
+/*!***********************************!*\
+  !*** ./src/Sections/TestMenu.tsx ***!
+  \***********************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -48174,14 +48957,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
-/* harmony import */ var _Screen__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Screen */ "./src/Screen.tsx");
-/* harmony import */ var _Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Layouts/OneAxisLayout */ "./src/Layouts/OneAxisLayout.tsx");
-/* harmony import */ var _ListButton__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../ListButton */ "./src/ListButton.tsx");
-/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Contexts/Actions */ "./src/Contexts/Actions.tsx");
-/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
-/* harmony import */ var _Layouts_FramedLayout__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Layouts/FramedLayout */ "./src/Layouts/FramedLayout.tsx");
-
-
+/* harmony import */ var _Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Layouts/OneAxisLayout */ "./src/Layouts/OneAxisLayout.tsx");
+/* harmony import */ var _ListButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../ListButton */ "./src/ListButton.tsx");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
 
 
 
@@ -48204,22 +48983,32 @@ const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles
         margin: "3cm"
     }
 });
-function TestMenu() {
+function TestMenu(props) {
     const classes = useStyles();
     const history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useHistory"])();
     const handleButtonTestLink = () => {
         console.log("BUTTEST");
         history.push("/settings/buttonTest");
     };
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screen__WEBPACK_IMPORTED_MODULE_3__["Screen"], null, (props) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null,
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: props.reference, className: classes.eventLayer },
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_FramedLayout__WEBPACK_IMPORTED_MODULE_8__["default"], { headerText: "Test Menu" },
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.contentPadder },
-                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_4__["default"], null,
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_5__["default"], { onActivate: handleButtonTestLink }, "Button test"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_5__["default"], null, "Hello world"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_5__["default"], { actionMap: new Map([[_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_6__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_7__["HIDButtonBitField"].X, "Purge", () => { })]]) }, "Hello world"),
-                        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_5__["default"], null, "Hello world")))))));
+    const handleJoystickTestLink = () => {
+        console.log("BUTTEST");
+        history.push("/settings/joysticksTest");
+    };
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.contentPadder },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__["default"], null,
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleButtonTestLink }, "Button test"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleJoystickTestLink }, "Joystick test"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { actionMap: new Map([[_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, "Purge", () => { })]]) }, "Hello world"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "1"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "2"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "3"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "4"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "5"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "6"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "7"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "8"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "9"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "10")));
 }
 
 
@@ -48237,7 +49026,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Transition; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+
 
 
 var TransitionPhase;
@@ -48247,37 +49038,59 @@ var TransitionPhase;
     TransitionPhase[TransitionPhase["In"] = 2] = "In";
     TransitionPhase[TransitionPhase["TransitioningOut"] = 3] = "TransitioningOut";
 })(TransitionPhase || (TransitionPhase = {}));
-const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_2__["createUseStyles"])({
     transition: {
+        position: "absolute",
+        top: 0,
+        pointerEvents: "none",
         height: "100%",
         width: "100%"
+    },
+    transitionIn: {
+        pointerEvents: "all"
     }
 });
-function Transition({ children, visible = true }) {
+function Transition({ children, visible = true, transition = "" }) {
     const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
     const classes = useStyles();
+    const animLookup = {
+        "": [
+            [
+                { opacity: 0.0 },
+                { opacity: 1.0 }
+            ],
+            [
+                { opacity: 1.0 },
+                { opacity: 0.0 }
+            ]
+        ],
+        "slide": [
+            [
+                { opacity: 0.0, transform: "translateX(-100px)" },
+                { opacity: 1.0, transform: "translateX(0px)" }
+            ],
+            [
+                { opacity: 1.0, transform: "translateX(0px)" },
+                { opacity: 0.0, transform: "translateX(100px)" }
+            ]
+        ]
+    };
     const [transitionPhase, setTransitionPhase] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(TransitionPhase.Out);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (ref.current) {
             if (visible && transitionPhase === TransitionPhase.Out) {
-                const anim = ref.current.animate([
-                    { opacity: 0.0 },
-                    { opacity: 1.0 }
-                ], { duration: 200, iterations: 1 });
+                const anim = ref.current.animate(animLookup[transition][0], { duration: 200, iterations: 1 });
                 setTransitionPhase(TransitionPhase.TransitioningIn);
                 anim.addEventListener("finish", () => setTransitionPhase(TransitionPhase.In));
             }
             else if (!visible && transitionPhase == TransitionPhase.In) {
-                const anim = ref.current.animate([
-                    { opacity: 1.0 },
-                    { opacity: 0.0 }
-                ], { duration: 200, iterations: 1 });
+                const anim = ref.current.animate(animLookup[transition][1], { duration: 200, iterations: 1 });
                 setTransitionPhase(TransitionPhase.TransitioningOut);
                 anim.addEventListener("finish", () => setTransitionPhase(TransitionPhase.Out));
             }
         }
     }, [ref.current, visible]);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: classes.transition }, transitionPhase === TransitionPhase.Out ? null : children);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.transition, transitionPhase === TransitionPhase.In && classes.transitionIn) }, transitionPhase === TransitionPhase.Out ? null : children);
 }
 
 
@@ -48395,13 +49208,14 @@ class WebIPC {
 /*!**************************!*\
   !*** ./src/WebIPCHID.ts ***!
   \**************************/
-/*! exports provided: HIDButtonBitField, HIDButtonEvent, HIDSubmodule, HIDSubmoduleSimulation */
+/*! exports provided: HIDButtonBitField, HIDButtonEvent, HIDJoystickEvent, HIDSubmodule, HIDSubmoduleSimulation */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HIDButtonBitField", function() { return HIDButtonBitField; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HIDButtonEvent", function() { return HIDButtonEvent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HIDJoystickEvent", function() { return HIDJoystickEvent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HIDSubmodule", function() { return HIDSubmodule; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HIDSubmoduleSimulation", function() { return HIDSubmoduleSimulation; });
 /* harmony import */ var _WebIPC__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./WebIPC */ "./src/WebIPC.ts");
@@ -48429,9 +49243,30 @@ var HIDButtonBitField;
     HIDButtonBitField[HIDButtonBitField["SLRight"] = 67108864] = "SLRight";
     HIDButtonBitField[HIDButtonBitField["SRRight"] = 134217728] = "SRRight";
 })(HIDButtonBitField || (HIDButtonBitField = {}));
-class HIDButtonEvent extends Event {
+const HIDButtonList = [
+    HIDButtonBitField.A,
+    HIDButtonBitField.B,
+    HIDButtonBitField.X,
+    HIDButtonBitField.Y,
+    HIDButtonBitField.LeftStick,
+    HIDButtonBitField.RightSitck,
+    HIDButtonBitField.L,
+    HIDButtonBitField.R,
+    HIDButtonBitField.ZL,
+    HIDButtonBitField.ZR,
+    HIDButtonBitField.Plus,
+    HIDButtonBitField.Minus,
+    HIDButtonBitField.LeftPad,
+    HIDButtonBitField.UpPad,
+    HIDButtonBitField.RightPad,
+    HIDButtonBitField.DownPad,
+    HIDButtonBitField.SLLeft,
+    HIDButtonBitField.SRLeft,
+    HIDButtonBitField.SLRight,
+    HIDButtonBitField.SRRight
+];
+class HIDButtonEvent {
     constructor(bt, pr) {
-        super("hidButtonEvent", { bubbles: true });
         this.button = bt;
         this.pressed = pr;
     }
@@ -48440,6 +49275,27 @@ class HIDButtonEvent extends Event {
     }
     isButtonPressed(button) {
         return !!(this.button & button) && this.pressed;
+    }
+    getListOfButtons() {
+        let ret = new Array();
+        for (let button of HIDButtonList) {
+            if (this.isButtonPressed(button)) {
+                ret.push(button);
+            }
+        }
+        return ret;
+    }
+    getCustomEvent() {
+        return new CustomEvent("hidButtonEvent", { bubbles: true, detail: this });
+    }
+}
+class HIDJoystickEvent {
+    constructor(axisX, axisY) {
+        this.axisX = axisX;
+        this.axisY = axisY;
+    }
+    getCustomEvent() {
+        return new CustomEvent("hidJoystickEvent", { bubbles: true, detail: this });
     }
 }
 class HIDSubmodule {
@@ -48463,33 +49319,57 @@ class HIDSubmoduleSimulation extends HIDSubmodule {
     constructor() {
         super(null);
         this.lastButtonReading = new Array(16).fill(0);
+        this.lastAxisReading = new Array(4).fill(0.0);
     }
     activateHIDEvents() {
         this.timeHandle = setInterval(() => {
             this.pollGamepads();
         }, 1000 / 60);
         this.handleKeyDownBind = this.handleKeyDown.bind(this);
+        this.handleKeyUpBind = this.handleKeyUp.bind(this);
         document.addEventListener("keydown", this.handleKeyDownBind);
+        document.addEventListener("keyup", this.handleKeyUpBind);
     }
     handleKeyDown(ev) {
         console.log(ev);
         if (ev.key === "ArrowUp") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, true).getCustomEvent());
         }
         else if (ev.key === "ArrowDown") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, true).getCustomEvent());
         }
         else if (ev.key === "ArrowLeft") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.LeftPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.LeftPad, true).getCustomEvent());
         }
         else if (ev.key === "ArrowRight") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.RightPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.RightPad, true).getCustomEvent());
         }
         else if (ev.key === "Enter") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.A, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.A, true).getCustomEvent());
         }
-        else if (ev.key === "Esc") {
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.B, true));
+        else if (ev.key === "Escape") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.B, true).getCustomEvent());
+        }
+    }
+    handleKeyUp(ev) {
+        console.log(ev);
+        if (ev.key === "ArrowUp") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, false).getCustomEvent());
+        }
+        else if (ev.key === "ArrowDown") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, false).getCustomEvent());
+        }
+        else if (ev.key === "ArrowLeft") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.LeftPad, false).getCustomEvent());
+        }
+        else if (ev.key === "ArrowRight") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.RightPad, false).getCustomEvent());
+        }
+        else if (ev.key === "Enter") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.A, false).getCustomEvent());
+        }
+        else if (ev.key === "Escape") {
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.B, false).getCustomEvent());
         }
     }
     pollGamepads() {
@@ -48510,8 +49390,14 @@ class HIDSubmoduleSimulation extends HIDSubmodule {
                 }
                 return gamepad.buttons[index].pressed;
             });
-            pressedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(pressedKeys, true));
-            releasedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(releasedKeys, false));
+            let axisChanged = false;
+            this.lastAxisReading = this.lastAxisReading.map((lastReading, index) => {
+                axisChanged = axisChanged || this.lastAxisReading[index] != lastReading;
+                return gamepad.axes[index];
+            });
+            pressedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(pressedKeys, true).getCustomEvent());
+            releasedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(releasedKeys, false).getCustomEvent());
+            axisChanged && document.activeElement.dispatchEvent(new HIDJoystickEvent(this.lastAxisReading[0], this.lastAxisReading[1]).getCustomEvent());
         }
     }
     deactivateHIDEvents() {
@@ -48573,6 +49459,11 @@ globalStyle.innerText = "\
 }\
 * {\
     font-family: SwitchUI;\
+    font-size: 20px;\
+}\
+::-webkit-scrollbar {\
+    width: 0px;\
+    background: transparent;\
 }";
 document.head.appendChild(globalStyle);
 //window.webipc.gamepad.simulate();
