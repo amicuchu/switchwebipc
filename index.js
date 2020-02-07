@@ -47112,6 +47112,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Screens_TestButtons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Screens/TestButtons */ "./src/Screens/TestButtons.tsx");
 /* harmony import */ var _Screens_FramedScreen__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Screens/FramedScreen */ "./src/Screens/FramedScreen.tsx");
 /* harmony import */ var _Sections_TestJoysticks__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Sections/TestJoysticks */ "./src/Sections/TestJoysticks.tsx");
+/* harmony import */ var _Sections_TestText__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Sections/TestText */ "./src/Sections/TestText.tsx");
+
 
 
 
@@ -47140,7 +47142,8 @@ function App() {
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.appContainer },
                 react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screens_FramedScreen__WEBPACK_IMPORTED_MODULE_7__["default"], null,
                     react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestMenu__WEBPACK_IMPORTED_MODULE_4__["default"], { path: "/", headerName: "Test menu" }),
-                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestJoysticks__WEBPACK_IMPORTED_MODULE_8__["default"], { path: "/settings/joysticksTest", headerName: "Joysticks" })),
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestJoysticks__WEBPACK_IMPORTED_MODULE_8__["default"], { path: "/settings/joysticksTest", headerName: "Joysticks" }),
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Sections_TestText__WEBPACK_IMPORTED_MODULE_9__["default"], { path: "/test/text", headerName: "Text test" })),
                 react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["Route"], { path: "/settings/buttonTest" }, (routeProps) => {
                     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: routeProps.match != null },
                         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screens_TestButtons__WEBPACK_IMPORTED_MODULE_6__["default"], null));
@@ -47164,12 +47167,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
 /* harmony import */ var _CommandButton__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommandButton */ "./src/CommandButton.tsx");
-/* harmony import */ var _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Icons/ButtonA */ "./src/Icons/ButtonA.tsx");
-/* harmony import */ var _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Icons/ButtonX */ "./src/Icons/ButtonX.tsx");
-/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Contexts/Actions */ "./src/Contexts/Actions.tsx");
-/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./WebIPCHID */ "./src/WebIPCHID.ts");
-
-
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Icon */ "./src/Icon.tsx");
 
 
 
@@ -47186,6 +47185,11 @@ const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles
         width: "100%",
         height: "1px",
         backgroundColor: "black"
+    },
+    commandBarBox: {
+        display: "flex",
+        flexDirection: "row-reverse",
+        height: "100%"
     }
 });
 function CommandBar() {
@@ -47196,7 +47200,7 @@ function CommandBar() {
         console.log(actionMap);
         setActionMap(actionMap);
     }, []);
-    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContext"]);
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_3__["ActionContext"]);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         actionManager.addListener(handleActionMapChange);
         return () => actionManager.removeHandler(handleActionMapChange);
@@ -47210,13 +47214,9 @@ function CommandBar() {
         console.log(res);
         return res;
     }, [actionMap]);
-    const iconButtonMap = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => new Map([
-        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].A, _Icons_ButtonA__WEBPACK_IMPORTED_MODULE_3__["default"]],
-        [_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__["default"]]
-    ]), []);
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.commandBar },
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.separator }),
-        actions.map((action) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandButton__WEBPACK_IMPORTED_MODULE_2__["default"], { iconButton: react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(iconButtonMap.get(action.assignedButton)), key: action.assignedButton, text: action.label, callback: action.callback })));
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.commandBarBox }, actions.map((action) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_CommandButton__WEBPACK_IMPORTED_MODULE_2__["default"], { iconButton: react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_4__["IconButtonMap"].get(action.assignedButton)), key: action.assignedButton, text: action.label, callback: action.callback }))));
 }
 
 
@@ -47244,7 +47244,8 @@ const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles
         display: "inline-flex",
         alignItems: "center",
         borderRadius: "5px",
-        padding: "18px 21px"
+        padding: "18px 21px",
+        margin: "5px 0"
     },
     commandButtonActive: {
         backgroundColor: "#00f5ff17"
@@ -47464,10 +47465,11 @@ __webpack_require__.r(__webpack_exports__);
 
 const FocusContext = react__WEBPACK_IMPORTED_MODULE_0___default.a.createContext(null);
 class FocusProps {
-    constructor(focused, grabFocus, notifyFocusability) {
+    constructor(focused, grabFocus, notifyFocusability, notifyElement) {
         this.focused = focused;
         this.grabFocus = grabFocus;
         this.notifyFocusability = notifyFocusability;
+        this.notifyElement = notifyElement;
     }
 }
 
@@ -47558,9 +47560,13 @@ function Control(props) {
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (focusProps)
             focusProps.notifyFocusability(true);
+        return () => {
+            //Be sure that actions get unlinked
+            if (actionManager)
+                actionManager.removeActionMapOverlay(ref.current);
+        };
     }, []);
     const handleHIDButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((ev) => {
-        //Webkit makes custom events not have prototype, migrate from plane object
         if (props.onHIDButton) {
             props.onHIDButton(ev);
             return;
@@ -47638,23 +47644,27 @@ function Control(props) {
     //React events stay in bubbling phase of root element, stopPropagation is useless there
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (ref.current && !ref.current["hooked"]) {
+            if (focusProps)
+                focusProps.notifyElement(ref.current);
             //handleGamepadKey is a stale closure, methods from layout must use state in function form
             if (navigationProps) {
                 ref.current.addEventListener("hidButtonEvent", (ev) => {
                     setLastHIDButtonEvent(ev.detail);
-                    ev.stopPropagation();
                 });
             }
             ref.current.addEventListener("touchstart", (ev) => {
+                console.log("Control startTouch");
                 setLastTouchStartEvent(ev);
                 if (!directlyActivable)
                     ev.stopPropagation();
             });
             ref.current.addEventListener("touchend", (ev) => {
+                console.log("Control endTouch");
                 setLastTouchEndEvent(ev);
                 //ev.stopPropagation();
             });
             ref.current.addEventListener("touchcancel", (ev) => {
+                console.log("Control cancelTouch");
                 setLastTouchCancelEvent(ev);
                 //ev.stopPropagation();
             });
@@ -47980,7 +47990,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function ButtonX(props) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 Q 923,788 857,853.5 791,919 702,956.5 613,994 512,994 411,994 322,956.5 233,919 167,853.5 101,788 62.5,700.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z M 459,497 277,767 H 381 L 510,565 641,767 H 747 L 562,499 725,257 H 626 L 512,435 398,257 H 294 Z" }));
+    let path;
+    if (props.variant === "unfilled") {
+        path = "m 512,102 q -85,0 -159.5,32.5 -74.5,32.5 -130,88 -55.5,55.5 -88,130 Q 102,427 102,512 q 0,85 32.5,159.5 32.5,74.5 88,129.5 55.5,55 130,87 74.5,32 159.5,32 85,0 159.5,-32 74.5,-32 130,-87 55.5,-55 88,-129.5 Q 922,597 922,512 922,427 889.5,352.5 857,278 801.5,222.5 746,167 671.5,134.5 597,102 512,102 Z m 0,-78 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,189.5 Q 923,790 857,856 791,922 702,960 613,998 512,998 411,998 322,960 233,922 167,856 101,790 62.5,701.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z m 42,475 173,251 H 637 L 510,554 384,750 H 297 L 467,498 314,274 h 86 L 512,447 623,274 h 83 z";
+    }
+    else {
+        path = "m 512,24 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 0,101 -38.5,188.5 Q 923,788 857,853.5 791,919 702,956.5 613,994 512,994 411,994 322,956.5 233,919 167,853.5 101,788 62.5,700.5 24,613 24,512 24,411 62.5,322 101,233 167,167 233,101 322,62.5 411,24 512,24 Z M 459,497 277,767 H 381 L 510,565 641,767 H 747 L 562,499 725,257 H 626 L 512,435 398,257 H 294 Z";
+    }
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: path }));
 }
 
 
@@ -48047,6 +48064,28 @@ __webpack_require__.r(__webpack_exports__);
 
 function ButtonZR(props) {
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 679,454 q 65,0 65,43 0,5 -1,12.5 -1,7.5 -9,15.5 -7,6 -20.5,11 -13.5,5 -37.5,5 h -44 v -87 z m 57,138 q 29,-8 50,-29 25,-27 25,-66 0,-49 -33.5,-76 Q 744,394 683,394 H 566 v 1 h -1 v 353 h 67 V 600 h 34 l 85,148 h 80 z M 492,679 H 277 L 489,397 V 335 H 185 v 1 68 H 392 L 180,686 v 62 h 312 v -1 z M 517,19 q 101,0 190,38.5 89,38.5 155,104.5 66,66 104.5,155 38.5,89 38.5,190 v 496 H 20 V 239 Q 20,194 37,154 54,114 84,84 114,54 154,36.5 194,19 239,19 Z" }));
+}
+
+
+/***/ }),
+
+/***/ "./src/Icons/Cross.tsx":
+/*!*****************************!*\
+  !*** ./src/Icons/Cross.tsx ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Cross; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
+
+
+function Cross(props) {
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "M 374.89423,1001.7583 V 650.84558 q 0,-6.52254 -6.52254,-6.52254 H 17.458936 q -6.522542,0 -6.522542,-6.52254 V 387.33489 q 0,-6.52254 6.522542,-6.52254 H 368.37169 q 6.52254,0 6.52254,-6.52254 V 23.377053 q 0,-6.522542 6.52254,-6.522542 h 250.46561 q 6.52254,0 6.52254,6.522542 V 374.28981 q 0,6.52254 6.52254,6.52254 h 350.91276 q 6.52258,0 6.52258,6.52254 V 637.8005 q 0,6.52254 -6.52258,6.52254 H 644.92746 q -6.52254,0 -6.52254,6.52254 v 350.91272 q 0,6.5226 -6.52254,6.5226 H 381.41677 q -6.52254,0 -6.52254,-6.5226 z" }));
 }
 
 
@@ -48140,28 +48179,6 @@ function LeftPad(props) {
 
 /***/ }),
 
-/***/ "./src/Icons/PressedArrow.tsx":
-/*!************************************!*\
-  !*** ./src/Icons/PressedArrow.tsx ***!
-  \************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PressedArrow; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
-
-
-function PressedArrow(props) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { viewBox: "0 0 650 460", svgPath: "M 441.09338,19.539578 V 176.53958 h 189 c 2.66667,0 4.33333,1.33333 5,4 0.66667,2.66667 0,4.66667 -2,6 l -307,258 c -1.44355,1.21315 -2.40372,2.29814 -3,2 l -4,-2 -307.000002,-258 c -2,-1.33333 -2.5000001,-3.33333 -1.5,-6 1,-2.66667 2.83333,-4 5.5,-4 H 200.09338 V 19.539578 c 0,-3.33333 1.66667,-5 5,-5 h 230 c 4,0 6,1.66667 6,5 z" }));
-}
-
-
-/***/ }),
-
 /***/ "./src/Icons/RStick.tsx":
 /*!******************************!*\
   !*** ./src/Icons/RStick.tsx ***!
@@ -48228,28 +48245,6 @@ function Screenshot(props) {
 
 /***/ }),
 
-/***/ "./src/Icons/Stick.tsx":
-/*!*****************************!*\
-  !*** ./src/Icons/Stick.tsx ***!
-  \*****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Stick; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icon */ "./src/Icon.tsx");
-
-
-function Stick(props) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icon__WEBPACK_IMPORTED_MODULE_1__["Icon"], Object.assign({}, props, { svgPath: "m 512,870 q 92,0 173,-31.5 Q 766,807 826,752 886,697 921,623.5 956,550 956,467 956,383 921,309.5 886,236 826,181.5 766,127 685,95 604,63 512,63 420,63 339,95 258,127 198,181.5 138,236 103,309.5 68,383 68,467 q 0,83 35,156.5 35,73.5 95,128.5 60,55 141,86.5 81,31.5 173,31.5 z M 512,5 Q 606,5 696.5,37.5 787,70 857.5,131 928,192 971,278 q 43,86 43,192 0,138 -40,240.5 Q 934,813 866,881.5 798,950 706.5,984 615,1018 512,1018 409,1018 318,984 227,950 158.5,881.5 90,813 50,710.5 10,608 10,470 10,364 53,278 96,192 166.5,131 237,70 327.5,37.5 418,5 512,5 Z m 0,722 q 65,0 122.5,-22.5 Q 692,682 735,643 778,604 803,552 828,500 828,441 828,382 803,330 778,278 735,239 692,200 634.5,177.5 577,155 512,155 447,155 389.5,177.5 332,200 289,239 q -43,39 -68,91 -25,52 -25,111 0,59 25,111 25,52 68,91 43,39 100.5,61.5 Q 447,727 512,727 Z m 0,-621 q 76,0 142.5,26.5 66.5,26.5 116,72 49.5,45.5 78,106.5 28.5,61 28.5,130 0,69 -28.5,130 -28.5,61 -78,106.5 -49.5,45.5 -116,72 Q 588,776 512,776 436,776 369.5,749.5 303,723 253.5,677.5 204,632 175.5,571 147,510 147,441 147,372 175.5,311 204,250 253.5,204.5 303,159 369.5,132.5 436,106 512,106 Z" }));
-}
-
-
-/***/ }),
-
 /***/ "./src/Icons/UpPad.tsx":
 /*!*****************************!*\
   !*** ./src/Icons/UpPad.tsx ***!
@@ -48290,6 +48285,7 @@ __webpack_require__.r(__webpack_exports__);
 function Layout(props) {
     const [focusedIndex, setFocusedIndex] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(props.initialFocusIndex);
     const [focusableList, setFocusableList] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(new Map());
+    const [focusElementList, setFocusElementList] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(new Map());
     const focusProps = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusContext"]);
     const isFocusedLayout = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => {
         if (focusProps) {
@@ -48313,9 +48309,18 @@ function Layout(props) {
             return newMap;
         });
     };
-    const getFocusPropsForChild = (focusIndex) => new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](focusIndex == focusedIndex && isFocusedLayout, handleGrabFocus.bind(null, focusIndex), handleNotifyFocusability.bind(null, focusIndex));
+    const handleNotifyElement = (index, element) => {
+        setFocusElementList((fl) => {
+            const newMap = new Map(fl);
+            newMap.set(index, element);
+            return newMap;
+        });
+    };
+    const getFocusPropsForChild = (focusIndex) => new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](focusIndex == focusedIndex && isFocusedLayout, handleGrabFocus.bind(null, focusIndex), handleNotifyFocusability.bind(null, focusIndex), handleNotifyElement.bind(null, focusIndex));
+    const getElementForChild = (focusIndex) => focusElementList.has(focusIndex) ? focusElementList.get(focusIndex) : null;
     const isFocusable = (focusedIndex) => focusableList.has(focusedIndex) ? focusableList.get(focusedIndex) : false;
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, props.children({ focusedIndex, getFocusPropsForChild, isFocusable }));
+    const isAnyFocusable = () => Array.from(focusableList.values()).reduce((previous, current) => previous || current, false);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, null, props.children({ focusedIndex, getFocusPropsForChild, isFocusable, focusElementList, getElementForChild, isAnyFocusable }));
 }
 
 
@@ -48442,6 +48447,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Layout */ "./src/Layout.tsx");
 /* harmony import */ var _Contexts_Focus__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Contexts/Focus */ "./src/Contexts/Focus.tsx");
 /* harmony import */ var _Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Contexts/Animation */ "./src/Contexts/Animation.tsx");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
+
 
 
 
@@ -48450,13 +48457,22 @@ __webpack_require__.r(__webpack_exports__);
 
 const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
     scrollArea: {
+        position: "relative",
         height: "100%",
         overflowX: "hidden",
         overflowY: "scroll",
         scrollbarWidth: "none",
-        scrollBehavior: "smooth",
+        //scrollBehavior: "smooth",
         margin: "-15px -10px",
         padding: "15px 10px",
+    },
+    scroll: {
+        position: "absolute",
+        right: 0,
+        height: 100,
+        width: 4,
+        borderRadius: 2,
+        backgroundColor: "#c5c5c5"
     }
 });
 function OneAxisLayout({ children, horizontal = false }) {
@@ -48464,38 +48480,173 @@ function OneAxisLayout({ children, horizontal = false }) {
     const animationManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Animation__WEBPACK_IMPORTED_MODULE_5__["AnimationContext"]);
     const classes = useStyles();
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layout__WEBPACK_IMPORTED_MODULE_3__["Layout"], { initialFocusIndex: 0 }, (props) => {
-        const navigateBackwards = () => {
-            console.log("navBack");
+        const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+        const scrollRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+        const scrollTimeHandleRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef(null);
+        const [mayExecScroll, setMayExecScroll] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [forwardsPressed, setForwardsPressed] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [backwardsPressed, setBackwardsPressed] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [isAlreadyBounced, setIsAlreadyBounced] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [timeSinceFirstNavigation, setTimeOnFirstNavigation] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(0);
+        const [timeOnNextNavigation, setTimeOnNextNavigation] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(1000);
+        const [isScrollMoving, setIsScrollMoving] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [scrollMoving, setScrollMoving] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(0);
+        const [isScrollCausedByJoystick, setIsScrollCausedByJoystick] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+        const [lastHidButtonEvent, setLastHidButtonEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+        const [lastHidJoystickEvent, setLastHidJoystickEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (scrollTimeHandleRef.current === null) {
+                scrollTimeHandleRef.current = window.setInterval(() => setMayExecScroll(true), 1000 / 60);
+            }
+            return () => {
+                clearInterval(scrollTimeHandleRef.current);
+            };
+        }, []);
+        const scrollData = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => {
+            if (scrollRef.current && ref.current) {
+                const areaHeight = ref.current.getBoundingClientRect().height;
+                const avaiableScrollHeight = areaHeight - 20;
+                const pageHeight = ref.current.scrollHeight;
+                const scrollHeight = areaHeight / pageHeight * avaiableScrollHeight;
+                const scrollTop = ref.current.scrollTop / pageHeight * avaiableScrollHeight;
+                return { areaHeight, avaiableScrollHeight, pageHeight, scrollHeight, scrollTop };
+            }
+            else {
+                return { areaHeight: 0, avaiableScrollHeight: 0, pageHeight: 0, scrollHeight: 0, scrollTop: 0 };
+            }
+        }, [scrollRef.current, ref.current]);
+        const navigate = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback((forward) => {
+            if (!props.isAnyFocusable()) {
+                setIsScrollMoving(true);
+                return;
+            }
             let newFocusedRow = props.focusedIndex;
             do {
-                newFocusedRow--;
-                if (newFocusedRow < 0) {
-                    animationManager.execAnimation("bounceUp");
+                newFocusedRow += forward ? 1 : -1;
+                if ((forward && newFocusedRow >= react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.count(children)) ||
+                    (!forward && newFocusedRow < 0)) {
+                    if (!isAlreadyBounced) {
+                        const animName = forward ?
+                            (horizontal ? "bounceRight" : "bounceDown") :
+                            (horizontal ? "bounceLeft" : "bounceUp");
+                        animationManager.execAnimation(animName);
+                        setIsAlreadyBounced(true);
+                    }
                     return;
                 }
             } while (!props.isFocusable(newFocusedRow));
-            console.log("grabbing " + newFocusedRow);
-            props.getFocusPropsForChild(newFocusedRow).grabFocus();
-        };
-        const navigateForwards = () => {
-            console.log("navForward");
-            let newFocusedRow = props.focusedIndex;
-            do {
-                newFocusedRow++;
-                if (newFocusedRow >= react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.count(children)) {
-                    animationManager.execAnimation("bounceDown");
-                    return;
+            const nextElem = props.getElementForChild(newFocusedRow);
+            if ((forward && ref.current.scrollTop + ref.current.clientHeight > nextElem.offsetTop) ||
+                (!forward && ref.current.scrollTop < nextElem.offsetTop)) {
+                props.getFocusPropsForChild(newFocusedRow).grabFocus();
+            }
+            else {
+                setIsScrollMoving(true);
+            }
+        }, [props]);
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (mayExecScroll) {
+                if (forwardsPressed || backwardsPressed) {
+                    console.log(scrollMoving);
+                    if (timeSinceFirstNavigation === 0) {
+                        navigate(forwardsPressed);
+                        setTimeOnNextNavigation(1000);
+                    }
+                    else if (timeSinceFirstNavigation > timeOnNextNavigation) {
+                        navigate(forwardsPressed);
+                        setIsScrollMoving(true);
+                        setTimeOnNextNavigation(timeSinceFirstNavigation + Math.round(2000 / Math.abs(scrollMoving)));
+                    }
+                    setTimeOnFirstNavigation(timeSinceFirstNavigation + 60);
                 }
-            } while (!props.isFocusable(newFocusedRow));
-            props.getFocusPropsForChild(newFocusedRow).grabFocus();
+                else {
+                    setScrollMoving(0);
+                    setIsScrollMoving(false);
+                    setTimeOnFirstNavigation(0);
+                    setIsAlreadyBounced(false);
+                }
+                if (isScrollMoving) {
+                    ref.current.scrollBy({ top: scrollMoving });
+                    const scrollTop = ref.current.scrollTop / scrollData.pageHeight * scrollData.avaiableScrollHeight;
+                    scrollRef.current.style.top = ref.current.scrollTop + scrollTop + "px";
+                    scrollRef.current.style.height = scrollData.scrollHeight + "px";
+                }
+                setMayExecScroll(false);
+            }
+        }, [mayExecScroll, scrollMoving]);
+        const handleNavigateBackwards = () => {
+            //setNavigateBackwards(true);
         };
+        const handleNavigateForwards = () => {
+            //setNavigateForwards(true);
+        };
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (lastHidButtonEvent) {
+                console.log(lastHidButtonEvent);
+                if (lastHidButtonEvent.isButtonPresent(_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].UpPad) && !horizontal) {
+                    setBackwardsPressed(lastHidButtonEvent.pressed);
+                    setScrollMoving(-20);
+                }
+                if (lastHidButtonEvent.isButtonPresent(_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].DownPad) && !horizontal) {
+                    setForwardsPressed(lastHidButtonEvent.pressed);
+                    setScrollMoving(20);
+                }
+                if (lastHidButtonEvent.isButtonPresent(_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].LeftPad) && horizontal) {
+                    setBackwardsPressed(lastHidButtonEvent.pressed);
+                }
+                if (lastHidButtonEvent.isButtonPresent(_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].RightPad) && horizontal) {
+                    setForwardsPressed(lastHidButtonEvent.pressed);
+                }
+            }
+        }, [lastHidButtonEvent]);
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (lastHidJoystickEvent) {
+                if (isScrollCausedByJoystick) {
+                    if (forwardsPressed && lastHidJoystickEvent.axisY < 0.1) {
+                        setForwardsPressed(false);
+                        setIsScrollCausedByJoystick(false);
+                    }
+                    else if (backwardsPressed && lastHidJoystickEvent.axisY > -0.1) {
+                        setBackwardsPressed(false);
+                        setIsScrollCausedByJoystick(false);
+                    }
+                    else {
+                        setScrollMoving(lastHidJoystickEvent.axisY * 20);
+                    }
+                }
+                else {
+                    if (lastHidJoystickEvent.axisY > 0.1) {
+                        setForwardsPressed(true);
+                        setIsScrollCausedByJoystick(true);
+                    }
+                    else if (lastHidJoystickEvent.axisY < -0.1) {
+                        setBackwardsPressed(true);
+                        setIsScrollCausedByJoystick(true);
+                    }
+                }
+            }
+        }, [lastHidJoystickEvent]);
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+            if (ref.current && !ref.current["hooked"]) {
+                ref.current.addEventListener("hidJoystickEvent", (ev) => setLastHidJoystickEvent(ev.detail));
+                ref.current.addEventListener("hidButtonEvent", (ev) => setLastHidButtonEvent(ev.detail));
+                if (!props.isAnyFocusable()) {
+                    ref.current.tabIndex = -1;
+                    ref.current.style.outline = "none";
+                    ref.current.focus();
+                }
+                ref.current["hooked"] = true;
+            }
+        }, [ref.current]);
         const navProps = new _Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationProps"](parentNavProps, horizontal ?
-            { navigateLeft: navigateBackwards, navigateRight: navigateForwards } :
-            { navigateUp: navigateBackwards, navigateDown: navigateForwards });
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.scrollArea }, react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child, index) => {
-            return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_4__["FocusContext"].Provider, { value: props.getFocusPropsForChild(index) },
-                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationContext"].Provider, { value: navProps }, child));
-        }));
+            { navigateLeft: handleNavigateBackwards, navigateRight: handleNavigateForwards } :
+            { navigateUp: handleNavigateBackwards, navigateDown: handleNavigateForwards });
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: classes.scrollArea },
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: scrollRef, className: classes.scroll }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child, index) => {
+                return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Focus__WEBPACK_IMPORTED_MODULE_4__["FocusContext"].Provider, { value: props.getFocusPropsForChild(index) },
+                    react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Contexts_Navigation__WEBPACK_IMPORTED_MODULE_2__["NavigationContext"].Provider, { value: navProps }, child));
+            }));
     });
 }
 
@@ -48610,36 +48761,36 @@ function OutlineBox({ visible }) {
     const bounceUp = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
         ref.current.animate([
             { transform: "translateY(0px)" },
-            { transform: "translateY(-5px)", state: 0.4 },
+            { transform: "translateY(-10px)", state: 0.4 },
             { transform: "translateY(0px)", state: 0.8 },
-            { transform: "translateY(-2px)", state: 0.9 },
+            { transform: "translateY(-5px)", state: 0.9 },
             { transform: "translateY(0px)" }
         ], { duration: 200, iterations: 1 });
     }, [ref.current]);
     const bounceDown = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
         ref.current.animate([
             { transform: "translateY(0px)" },
-            { transform: "translateY(5px)", state: 0.4 },
+            { transform: "translateY(10px)", state: 0.4 },
             { transform: "translateY(0px)", state: 0.8 },
-            { transform: "translateY(2px)", state: 0.9 },
+            { transform: "translateY(5px)", state: 0.9 },
             { transform: "translateY(0px)" }
         ], { duration: 200, iterations: 1 });
     }, [ref.current]);
     const bounceLeft = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
         ref.current.animate([
             { transform: "translateX(0px)" },
-            { transform: "translateX(-5px)", state: 0.4 },
+            { transform: "translateX(-10px)", state: 0.4 },
             { transform: "translateX(0px)", state: 0.8 },
-            { transform: "translateX(-2px)", state: 0.9 },
+            { transform: "translateX(-5px)", state: 0.9 },
             { transform: "translateX(0px)" }
         ], { duration: 200, iterations: 1 });
     }, [ref.current]);
     const bounceRight = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
         ref.current.animate([
             { transform: "translateX(0px)" },
-            { transform: "translateX(5px)", state: 0.4 },
+            { transform: "translateX(10px)", state: 0.4 },
             { transform: "translateX(0px)", state: 0.8 },
-            { transform: "translateX(2px)", state: 0.9 },
+            { transform: "translateX(5px)", state: 0.9 },
             { transform: "translateX(0px)" }
         ], { duration: 200, iterations: 1 });
     }, [ref.current]);
@@ -48686,17 +48837,17 @@ function Screen(props) {
     const [lastTouchStartEv, setLastTouchStartEv] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
     const [lastHIDButtonEv, setLastHIDButtonEv] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(null);
     const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const handleHIDButtonRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef((ev) => {
+        setLastHIDButtonEv(ev.detail);
+    });
     const useFocusManager = props.useFocusManager === undefined ? true : props.useFocusManager;
     const grabFocus = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => setIsFocused(true), []);
     const notifyFocusability = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => { }, []);
-    const focusProps = useFocusManager ? new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](isFocused, grabFocus, notifyFocusability) : null;
+    const focusProps = useFocusManager ? new _Contexts_Focus__WEBPACK_IMPORTED_MODULE_1__["FocusProps"](isFocused, grabFocus, notifyFocusability, () => { }) : null;
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
-        const handleHIDButton = (ev) => {
-            setLastHIDButtonEv(ev.detail);
-        };
-        document.addEventListener("hidButtonEvent", handleHIDButton, false);
+        document.addEventListener("hidButtonEvent", handleHIDButtonRef.current, false);
         return () => {
-            document.removeEventListener("hidButtonEvent", handleHIDButton);
+            document.removeEventListener("hidButtonEvent", handleHIDButtonRef.current);
         };
     }, []);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
@@ -48707,6 +48858,7 @@ function Screen(props) {
     }, [ref.current]);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (lastTouchStartEv) {
+            console.log("Screen startTouch");
             setIsFocused(false);
         }
     }, [lastTouchStartEv]);
@@ -48757,6 +48909,8 @@ function FramedScreen({ children }) {
     const rchildren = react__WEBPACK_IMPORTED_MODULE_0___default.a.Children.map(children, (child) => {
         if (react__WEBPACK_IMPORTED_MODULE_0___default.a.isValidElement(child)) {
             const match = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_2__["useRouteMatch"])({ path: child.props.path, exact: true });
+            console.log("Match method");
+            console.log(!!match);
             if (match) {
                 headerName = child.props.headerName;
             }
@@ -48766,7 +48920,6 @@ function FramedScreen({ children }) {
             return child;
         }
     });
-    console.log("Post children");
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Transition__WEBPACK_IMPORTED_MODULE_5__["default"], { visible: !!headerName },
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Screen__WEBPACK_IMPORTED_MODULE_4__["Screen"], null, (props) => react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: props.reference, className: classes.eventLayer },
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_FramedLayout__WEBPACK_IMPORTED_MODULE_3__["default"], { headerText: headerName }, rchildren))));
@@ -48929,15 +49082,225 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TestJoysticks; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Icons_Stick__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Icons/Stick */ "./src/Icons/Stick.tsx");
-/* harmony import */ var _Icons_PressedArrow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Icons/PressedArrow */ "./src/Icons/PressedArrow.tsx");
+/* harmony import */ var clsx__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! clsx */ "./node_modules/clsx/dist/clsx.m.js");
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
+/* harmony import */ var _Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Icons/ButtonX */ "./src/Icons/ButtonX.tsx");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var _Icons_Cross__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Icons/Cross */ "./src/Icons/Cross.tsx");
 
 
 
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_2__["createUseStyles"])({
+    paddingArea: {
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    joystickArea: {
+        position: "relative",
+        height: 280,
+        width: 280,
+        marginBottom: 30,
+        outline: "none"
+    },
+    circle: {
+        position: "absolute",
+        height: "calc(100% - 40px);",
+        width: "calc(100% - 40px);",
+        margin: 20,
+        border: "solid 1px #b0b0b0",
+        borderRadius: 1000
+    },
+    circleTouched: {
+        borderColor: "#2d4ef1"
+    },
+    verticalLine: {
+        position: "absolute",
+        left: "50%",
+        height: "100%",
+        border: "solid 1px #b0b0b0"
+    },
+    horizontalLine: {
+        position: "absolute",
+        top: "50%",
+        width: "100%",
+        border: "solid 1px #b0b0b0"
+    },
+    touchedLine: {
+        borderColor: "#2d4ef1"
+    },
+    litleCircle: {
+        display: "inline-block",
+        height: 15,
+        width: 15,
+        backgroundColor: "#2d4ef1",
+        borderRadius: 100
+    },
+    cross: {
+        fill: "#2d4ef1",
+    },
+    littleCirclePointer: {
+        position: "absolute",
+        border: "solid 1px white"
+    },
+    crossPointer: {
+        position: "absolute",
+        top: "calc(50% - 12px)",
+        left: "calc(50% - 12px)",
+        stroke: "white",
+        strokeWidth: 90
+    },
+    textBox: {
+        alignSelf: "left"
+    },
+    headerText: {
+        fontSize: 24,
+        marginBottom: 25
+    },
+    listText: {
+        marginBottom: 15
+    },
+    numListText: {
+        fontSize: 30,
+        paddingRight: 15
+    },
+    lastText: {
+        marginTop: 20,
+        fontSize: 24
+    },
+    separator: {
+        width: 1015,
+        height: 1,
+        margin: "0 -40px",
+        marginTop: 5,
+        backgroundColor: "#cdcdcd"
+    },
+    invisible: {
+        visibility: "hidden"
+    }
+});
 function TestJoysticks(props) {
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null,
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Stick__WEBPACK_IMPORTED_MODULE_1__["default"], { size: 40 }),
-        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_PressedArrow__WEBPACK_IMPORTED_MODULE_2__["default"], { size: 40 }));
+    const classes = useStyles();
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["ActionContext"]);
+    const history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_6__["useHistory"])();
+    const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const pointRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const circleRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const [lastHidJoystickEvent, setLastHidJoystickEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+    const [lastHidButtonEvent, setLastHidButtonEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+    const [isInCenter, setIsInCenter] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(true);
+    const [isInExtreme, setIsInExtreme] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(false);
+    const handleBack = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        history.goBack();
+    }, []);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (actionManager) {
+            actionManager.addActionMapOverlay(new Map([
+                [_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].B, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].B, "Atrás", handleBack)],
+                [_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].X, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].X, "Calibrar", () => { })],
+                [_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].Y, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].Y, "Restaurar la configuración original", () => { })]
+            ]), ref.current);
+            return () => {
+                actionManager.removeActionMapOverlay(ref.current);
+            };
+        }
+    });
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (ref.current && !ref.current["hooked"]) {
+            ref.current.addEventListener("hidJoystickEvent", (ev) => setLastHidJoystickEvent(ev.detail));
+            ref.current.addEventListener("hidButtonEvent", (ev) => setLastHidButtonEvent(ev.detail));
+            ref.current.focus();
+            ref.current["hooked"] = true;
+        }
+    }, [ref.current]);
+    const pointCalcs = react__WEBPACK_IMPORTED_MODULE_0___default.a.useMemo(() => {
+        if (ref.current && pointRef.current && circleRef.current) {
+            return {
+                halfX: (ref.current.getBoundingClientRect().width) / 2 - pointRef.current.getBoundingClientRect().width / 2,
+                halfY: (ref.current.getBoundingClientRect().height) / 2 - pointRef.current.getBoundingClientRect().height / 2,
+                halfInCircleX: (circleRef.current.getBoundingClientRect().width) / 2 + pointRef.current.getBoundingClientRect().width / 2,
+                halfInCircleY: (circleRef.current.getBoundingClientRect().height) / 2 + pointRef.current.getBoundingClientRect().width / 2,
+            };
+        }
+        else {
+            return { halfX: 0, halfY: 0, halfInCircleX: 0, halfInCircleY: 0 };
+        }
+    }, [ref.current, pointRef.current, circleRef.current]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (pointRef.current) {
+            if (lastHidJoystickEvent && pointRef.current && lastHidJoystickEvent.leftJoystick) {
+                let axisX = lastHidJoystickEvent.axisX;
+                let axisY = lastHidJoystickEvent.axisY;
+                const radio = Math.hypot(axisX, axisY);
+                if (radio > 1.0 || Math.abs(axisX) === 1.0 || Math.abs(axisY) === 1.0) {
+                    //Overload
+                    setIsInExtreme(true);
+                    setIsInCenter(false);
+                    const angle = Math.abs(Math.atan(axisX / axisY));
+                    axisX = Math.sin(angle) * Math.sign(axisX);
+                    axisY = Math.cos(angle) * Math.sign(axisY);
+                }
+                else if (radio === 0.0) {
+                    setIsInExtreme(false);
+                    setIsInCenter(true);
+                }
+                else {
+                    setIsInExtreme(false);
+                    setIsInCenter(false);
+                }
+                pointRef.current.style.left = (pointCalcs.halfX + pointCalcs.halfInCircleX * axisX) + "px";
+                pointRef.current.style.top = (pointCalcs.halfY + pointCalcs.halfInCircleY * axisY) + "px";
+            }
+            else if (!lastHidJoystickEvent) {
+                pointRef.current.style.left = pointCalcs.halfX + "px";
+                pointRef.current.style.top = pointCalcs.halfY + "px";
+            }
+        }
+    }, [pointRef.current, lastHidJoystickEvent]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (lastHidButtonEvent) {
+            if (lastHidButtonEvent.isButtonPressed(_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].B)) {
+                handleBack();
+            }
+            else if (lastHidButtonEvent.isButtonPressed(_WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDButtonBitField"].X)) {
+                //handleCalibrate
+            }
+        }
+    });
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.paddingArea },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: classes.joystickArea, tabIndex: -1 },
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: circleRef, className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.circle, isInExtreme && classes.circleTouched) }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.verticalLine, isInCenter && classes.touchedLine) }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.horizontalLine, isInCenter && classes.touchedLine) }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: pointRef, className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.litleCircle, classes.littleCirclePointer, isInCenter && classes.invisible) }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Cross__WEBPACK_IMPORTED_MODULE_7__["default"], { className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.cross, classes.crossPointer, !isInCenter && classes.invisible) })),
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.textBox },
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.headerText }, "Comprueba los siguientes puntos:"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.listText },
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { className: classes.numListText }, "1."),
+                "Que ",
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_Cross__WEBPACK_IMPORTED_MODULE_7__["default"], { className: classes.cross }),
+                " sustituye a ",
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.litleCircle }),
+                " cuando no se mueve la palanca."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.listText },
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", { className: classes.numListText }, "2."),
+                "Que el circulo cambia de color cuando el punto sale de \u00E9l."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.separator }),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.lastText },
+                "Si la palanca no funciona correctamente pulsa ",
+                react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Icons_ButtonX__WEBPACK_IMPORTED_MODULE_4__["default"], { variant: "unfilled" }),
+                " para recalibrarla.")));
 }
 
 
@@ -48959,10 +49322,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 /* harmony import */ var _Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Layouts/OneAxisLayout */ "./src/Layouts/OneAxisLayout.tsx");
 /* harmony import */ var _ListButton__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../ListButton */ "./src/ListButton.tsx");
-/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Contexts/Actions */ "./src/Contexts/Actions.tsx");
-/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
-
-
 
 
 
@@ -48994,12 +49353,24 @@ function TestMenu(props) {
         console.log("BUTTEST");
         history.push("/settings/joysticksTest");
     };
+    const handleTestTextLink = () => {
+        console.log("BUTTEST");
+        history.push("/test/text");
+    };
+    const handleExit = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        if (window.nx) {
+            window.nx.endApplet();
+        }
+        else {
+            window.close();
+        }
+    }, []);
     return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { className: classes.contentPadder },
         react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_3__["default"], null,
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleButtonTestLink }, "Button test"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleJoystickTestLink }, "Joystick test"),
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { actionMap: new Map([[_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_5__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_6__["HIDButtonBitField"].X, "Purge", () => { })]]) }, "Hello world"),
-            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "1"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleExit }, "Exit"),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], { onActivate: handleTestTextLink }, "Text text"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "2"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "3"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "4"),
@@ -49009,6 +49380,151 @@ function TestMenu(props) {
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "8"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "9"),
             react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ListButton__WEBPACK_IMPORTED_MODULE_4__["default"], null, "10")));
+}
+
+
+/***/ }),
+
+/***/ "./src/Sections/TestText.tsx":
+/*!***********************************!*\
+  !*** ./src/Sections/TestText.tsx ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TestText; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-jss */ "./node_modules/react-jss/dist/react-jss.esm.js");
+/* harmony import */ var _WebIPCHID__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../WebIPCHID */ "./src/WebIPCHID.ts");
+/* harmony import */ var _Contexts_Actions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Contexts/Actions */ "./src/Contexts/Actions.tsx");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var _Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Layouts/OneAxisLayout */ "./src/Layouts/OneAxisLayout.tsx");
+
+
+
+
+
+
+const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_1__["createUseStyles"])({
+    paddingArea: {
+        display: "flex",
+        height: "100%",
+        width: "100%",
+        padding: 20,
+        boxSizing: "border-box",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    joystickArea: {
+        position: "relative",
+        height: 280,
+        width: 280,
+        marginBottom: 30,
+        outline: "none"
+    },
+    circle: {
+        position: "absolute",
+        height: "calc(100% - 40px);",
+        width: "calc(100% - 40px);",
+        margin: 20,
+        border: "solid 1px #b0b0b0",
+        borderRadius: 1000
+    },
+    circleTouched: {
+        borderColor: "blue"
+    },
+    verticalLine: {
+        position: "absolute",
+        left: "50%",
+        height: "100%",
+        border: "solid 1px #b0b0b0"
+    },
+    horizontalLine: {
+        position: "absolute",
+        top: "50%",
+        width: "100%",
+        border: "solid 1px #b0b0b0"
+    },
+    touchedLine: {
+        borderColor: "blue"
+    },
+    litleCircle: {
+        position: "absolute",
+        height: 15,
+        width: 15,
+        backgroundColor: "blue",
+        borderRadius: 100
+    },
+    textBox: {
+        alignSelf: "left"
+    },
+    headerText: {
+        fontSize: 24,
+        marginBottom: 25
+    },
+    listText: {
+        marginBottom: 15
+    },
+    numListText: {
+        fontSize: 30,
+        paddingRight: 15
+    },
+    lastText: {
+        marginTop: 20,
+        fontSize: 24
+    },
+    separator: {
+        width: 1015,
+        height: 1,
+        margin: "0 -40px",
+        marginTop: 5,
+        backgroundColor: "#cdcdcd"
+    }
+});
+function TestText(props) {
+    const classes = useStyles();
+    const actionManager = react__WEBPACK_IMPORTED_MODULE_0___default.a.useContext(_Contexts_Actions__WEBPACK_IMPORTED_MODULE_3__["ActionContext"]);
+    const history = Object(react_router_dom__WEBPACK_IMPORTED_MODULE_4__["useHistory"])();
+    const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const [lastHidButtonEvent, setLastHidButtonEvent] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState();
+    const handleBack = react__WEBPACK_IMPORTED_MODULE_0___default.a.useCallback(() => {
+        history.goBack();
+    }, []);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (actionManager) {
+            actionManager.addActionMapOverlay(new Map([
+                [_WebIPCHID__WEBPACK_IMPORTED_MODULE_2__["HIDButtonBitField"].B, new _Contexts_Actions__WEBPACK_IMPORTED_MODULE_3__["Action"](_WebIPCHID__WEBPACK_IMPORTED_MODULE_2__["HIDButtonBitField"].B, "Atrás", handleBack)]
+            ]), ref.current);
+            return () => {
+                actionManager.removeActionMapOverlay(ref.current);
+            };
+        }
+    });
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (ref.current && !ref.current["hooked"]) {
+            ref.current.addEventListener("hidButtonEvent", (ev) => setLastHidButtonEvent(ev.detail));
+            ref.current.focus();
+            ref.current["hooked"] = true;
+        }
+    }, [ref.current]);
+    react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
+        if (lastHidButtonEvent) {
+            if (lastHidButtonEvent.isButtonPressed(_WebIPCHID__WEBPACK_IMPORTED_MODULE_2__["HIDButtonBitField"].B)) {
+                handleBack();
+            }
+        }
+    });
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: classes.paddingArea },
+        react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_Layouts_OneAxisLayout__WEBPACK_IMPORTED_MODULE_5__["default"], null,
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras in dui cursus, venenatis orci ac, semper risus. Aliquam maximus ex lectus, id fermentum ligula faucibus sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec id venenatis turpis. Praesent ac tellus non tortor rutrum iaculis sit amet ac ante. Nam eu ornare tortor. Donec a metus eu justo consectetur accumsan eget pretium libero. Aliquam fermentum vitae nulla id pellentesque. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla libero lorem, eleifend eu sem vel, varius blandit ipsum. Aliquam placerat, erat vitae ultricies fermentum, dui arcu sodales risus, id hendrerit ante dui id quam."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Ut convallis fermentum malesuada. Aliquam id dapibus ligula. Proin odio augue, porta nec porta eget, sagittis quis erat. Phasellus dignissim placerat metus nec dictum. Suspendisse commodo libero sit amet nibh ornare mattis. Nulla blandit, leo eget ultricies imperdiet, urna ex cursus justo, id dictum velit eros ullamcorper nunc. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed interdum tellus sed neque euismod euismod. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis quis urna eu nunc egestas volutpat. Curabitur ac risus non sem feugiat luctus congue vitae quam."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Donec efficitur, nulla sit amet aliquam fringilla, nulla nulla varius diam, vitae dapibus ipsum nisi at mauris. Morbi erat odio, interdum sed congue nec, finibus sed elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum et vehicula eros. Morbi posuere, lorem vel condimentum aliquam, diam mauris ultricies arcu, vel tempus justo nunc in metus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce accumsan eros ut mauris lobortis, sit amet imperdiet risus interdum. Fusce iaculis ornare leo, sit amet facilisis erat egestas ullamcorper. Fusce dui lorem, aliquet vel consectetur ut, tristique vitae leo. Maecenas eros libero, porttitor vitae leo quis, condimentum facilisis turpis. Cras hendrerit ornare est, ac faucibus dolor ullamcorper at. Sed lobortis libero iaculis, commodo tortor vestibulum, maximus est."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Quisque vulputate massa ut diam elementum, sed feugiat turpis dignissim. Pellentesque et metus pretium, sagittis est id, molestie mi. Pellentesque molestie ut nisl in pellentesque. Pellentesque quis semper ex, ut interdum dui. Nulla vel massa eu magna sodales iaculis. Etiam id semper turpis. Pellentesque mi metus, volutpat sed mi ut, hendrerit luctus turpis. Duis id fringilla odio, quis porttitor sem. Quisque ac est suscipit, auctor tortor eu, volutpat augue. Suspendisse ac interdum nibh, ac cursus leo. Vivamus vel mollis nulla, ut iaculis quam."),
+            react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Aenean at eleifend neque, eget sagittis sem. Proin nunc augue, mollis eu aliquam id, faucibus ac magna. Cras molestie pulvinar justo, ut consectetur risus suscipit sodales. Phasellus sed tincidunt magna. Maecenas ullamcorper eleifend aliquet. Duis ullamcorper lorem metus, quis venenatis orci pharetra eget. Integer volutpat semper lobortis. Donec est lectus, eleifend ut risus ut, congue lobortis turpis. Morbi suscipit sed quam eget pharetra. Fusce ullamcorper posuere est, vitae tincidunt risus porta eget. Maecenas non ornare nunc, varius mattis magna. Vestibulum dignissim lacus eu neque consectetur condimentum. Maecenas vel semper odio. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam aliquam sapien sem, vitae vestibulum leo mollis in.")));
 }
 
 
@@ -49042,16 +49558,16 @@ const useStyles = Object(react_jss__WEBPACK_IMPORTED_MODULE_2__["createUseStyles
     transition: {
         position: "absolute",
         top: 0,
-        pointerEvents: "none",
         height: "100%",
         width: "100%"
     },
-    transitionIn: {
-        pointerEvents: "all"
+    transitionOut: {
+        display: "none"
     }
 });
 function Transition({ children, visible = true, transition = "" }) {
     const ref = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
+    const animRef = react__WEBPACK_IMPORTED_MODULE_0___default.a.useRef();
     const classes = useStyles();
     const animLookup = {
         "": [
@@ -49076,21 +49592,33 @@ function Transition({ children, visible = true, transition = "" }) {
         ]
     };
     const [transitionPhase, setTransitionPhase] = react__WEBPACK_IMPORTED_MODULE_0___default.a.useState(TransitionPhase.Out);
+    console.log("Transition");
+    console.log("visible: " + visible);
+    console.log("transition: " + transition);
+    console.log("state: " + transitionPhase);
     react__WEBPACK_IMPORTED_MODULE_0___default.a.useEffect(() => {
         if (ref.current) {
             if (visible && transitionPhase === TransitionPhase.Out) {
-                const anim = ref.current.animate(animLookup[transition][0], { duration: 200, iterations: 1 });
+                console.log("Transition out to in");
+                animRef.current = ref.current.animate(animLookup[transition][0], { duration: 200, iterations: 1 });
                 setTransitionPhase(TransitionPhase.TransitioningIn);
-                anim.addEventListener("finish", () => setTransitionPhase(TransitionPhase.In));
+                animRef.current.addEventListener("finish", () => {
+                    console.log("Transition out to in finished");
+                    setTransitionPhase(TransitionPhase.In);
+                });
             }
-            else if (!visible && transitionPhase == TransitionPhase.In) {
-                const anim = ref.current.animate(animLookup[transition][1], { duration: 200, iterations: 1 });
+            else if (!visible && transitionPhase === TransitionPhase.In) {
+                console.log("Transition in to out");
+                animRef.current = ref.current.animate(animLookup[transition][1], { duration: 200, iterations: 1 });
                 setTransitionPhase(TransitionPhase.TransitioningOut);
-                anim.addEventListener("finish", () => setTransitionPhase(TransitionPhase.Out));
+                animRef.current.addEventListener("finish", () => {
+                    setTransitionPhase(TransitionPhase.Out);
+                    ref.current.classList.add(classes.transitionOut);
+                });
             }
         }
     }, [ref.current, visible]);
-    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.transition, transitionPhase === TransitionPhase.In && classes.transitionIn) }, transitionPhase === TransitionPhase.Out ? null : children);
+    return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", { ref: ref, className: Object(clsx__WEBPACK_IMPORTED_MODULE_1__["default"])(classes.transition, transitionPhase === TransitionPhase.Out && classes.transitionOut) }, transitionPhase === TransitionPhase.Out ? null : children);
 }
 
 
@@ -49276,6 +49804,9 @@ class HIDButtonEvent {
     isButtonPressed(button) {
         return !!(this.button & button) && this.pressed;
     }
+    isButtonPresent(button) {
+        return !!(this.button & button);
+    }
     getListOfButtons() {
         let ret = new Array();
         for (let button of HIDButtonList) {
@@ -49290,7 +49821,8 @@ class HIDButtonEvent {
     }
 }
 class HIDJoystickEvent {
-    constructor(axisX, axisY) {
+    constructor(leftJoystick, axisX, axisY) {
+        this.leftJoystick = leftJoystick;
         this.axisX = axisX;
         this.axisY = axisY;
     }
@@ -49390,14 +49922,17 @@ class HIDSubmoduleSimulation extends HIDSubmodule {
                 }
                 return gamepad.buttons[index].pressed;
             });
-            let axisChanged = false;
+            let axisChanged = [false, false, false, false];
             this.lastAxisReading = this.lastAxisReading.map((lastReading, index) => {
-                axisChanged = axisChanged || this.lastAxisReading[index] != lastReading;
+                axisChanged[index] = axisChanged[index] || gamepad.axes[index] != lastReading;
                 return gamepad.axes[index];
             });
             pressedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(pressedKeys, true).getCustomEvent());
             releasedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(releasedKeys, false).getCustomEvent());
-            axisChanged && document.activeElement.dispatchEvent(new HIDJoystickEvent(this.lastAxisReading[0], this.lastAxisReading[1]).getCustomEvent());
+            (axisChanged[0] || axisChanged[1]) &&
+                document.activeElement.dispatchEvent(new HIDJoystickEvent(true, this.lastAxisReading[0], this.lastAxisReading[1]).getCustomEvent());
+            (axisChanged[2] || axisChanged[3]) &&
+                document.activeElement.dispatchEvent(new HIDJoystickEvent(false, this.lastAxisReading[2], this.lastAxisReading[3]).getCustomEvent());
         }
     }
     deactivateHIDEvents() {
@@ -49453,14 +49988,6 @@ document.body.style.padding = "0";
 document.write('<script data-consolejs-channel="f8f07e01-3d29-cfe5-ec8b-55d8a11e2c9f" src="https://remotejs.com/agent/agent.js"></script>');
 let globalStyle = document.createElement("style");
 globalStyle.innerText = "\
-@font-face {\
-    font-family: SwitchUI;\
-    src: url(SwitchUI.ttf);\
-}\
-* {\
-    font-family: SwitchUI;\
-    font-size: 20px;\
-}\
 ::-webkit-scrollbar {\
     width: 0px;\
     background: transparent;\
@@ -49468,7 +49995,20 @@ globalStyle.innerText = "\
 document.head.appendChild(globalStyle);
 //window.webipc.gamepad.simulate();
 if (window.nx) {
-    window.nx.footer.setFixed("hidden");
+    window.nx.footer.setAssign("X", "", () => { }, { se: "" });
+}
+else {
+    let nonNXStyle = document.createElement("style");
+    nonNXStyle.innerText = "\
+    @font-face {\
+        font-family: SwitchUI;\
+        src: url(SwitchUI.ttf);\
+    }\
+    * {\
+        font-family: SwitchUI;\
+        font-size: 20px;\
+    }";
+    document.head.appendChild(nonNXStyle);
 }
 window.webIPC = {
     hid: new _WebIPCHID__WEBPACK_IMPORTED_MODULE_3__["HIDSubmoduleSimulation"](),
