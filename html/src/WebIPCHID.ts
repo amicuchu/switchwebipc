@@ -23,20 +23,80 @@ export enum HIDButtonBitField{
     SRRight = 1 << 27
 }
 
+const HIDButtonList = [
+    HIDButtonBitField.A,
+    HIDButtonBitField.B,
+    HIDButtonBitField.X,
+    HIDButtonBitField.Y,
+    HIDButtonBitField.LeftStick,
+    HIDButtonBitField.RightSitck,
+    HIDButtonBitField.L,
+    HIDButtonBitField.R,
+    HIDButtonBitField.ZL,
+    HIDButtonBitField.ZR,
+    HIDButtonBitField.Plus,
+    HIDButtonBitField.Minus,
+    HIDButtonBitField.LeftPad,
+    HIDButtonBitField.UpPad,
+    HIDButtonBitField.RightPad,
+    HIDButtonBitField.DownPad,
+    HIDButtonBitField.SLLeft,
+    HIDButtonBitField.SRLeft,
+    HIDButtonBitField.SLRight,
+    HIDButtonBitField.SRRight
+]
 
 
-export class HIDButtonEvent extends Event{
+
+export class HIDButtonEvent{
     button:HIDButtonBitField
     pressed:boolean
     constructor(bt:HIDButtonBitField, pr:boolean){
-        super("hidButtonEvent", {bubbles: true});
         this.button = bt;
         this.pressed = pr;
+    }
+
+    static clonePlaneObject(evPlane){
+        return new HIDButtonEvent(evPlane.button, evPlane.pressed);
     }
 
     isButtonPressed(button:HIDButtonBitField){
         return !!(this.button&button) && this.pressed;
     }
+
+    isButtonPresent(button:HIDButtonBitField){
+        return !!(this.button&button);
+    }
+
+    getListOfButtons(){
+        let ret = new Array<HIDButtonBitField>();
+        for(let button of HIDButtonList){
+            if(this.isButtonPressed(button)){
+                ret.push(button)
+            }
+        }
+        return ret;
+    }
+
+    getCustomEvent(){
+        return new CustomEvent("hidButtonEvent", {bubbles: true, detail: this as HIDButtonEvent});
+    }
+}
+
+export class HIDJoystickEvent{
+    leftJoystick:boolean;
+    axisX:number;
+    axisY:number;
+    constructor(leftJoystick:boolean, axisX: number, axisY:number){
+        this.leftJoystick = leftJoystick;
+        this.axisX = axisX;
+        this.axisY = axisY;
+    }
+
+    getCustomEvent(){
+        return new CustomEvent("hidJoystickEvent", {bubbles: true, detail: this as HIDJoystickEvent});
+    }
+
 }
 
 
@@ -67,19 +127,24 @@ export class HIDSubmodule{
 export class HIDSubmoduleSimulation extends HIDSubmodule{
     timeHandle:any;
     lastButtonReading:boolean[];
+    lastAxisReading:number[];
     handleKeyDownBind:(ev:KeyboardEvent)=>void;
+    handleKeyUpBind:(ev:KeyboardEvent)=>void;
     
     constructor(){
         super(null);
-        this.lastButtonReading = new Array(10).fill(0);
+        this.lastButtonReading = new Array(16).fill(0);
+        this.lastAxisReading = new Array(4).fill(0.0);
     }
 
     activateHIDEvents(){
         this.timeHandle = setInterval(() => {
             this.pollGamepads();
-        }, 1000);
+        }, 1000/60);
         this.handleKeyDownBind = this.handleKeyDown.bind(this);
+        this.handleKeyUpBind = this.handleKeyUp.bind(this);
         document.addEventListener("keydown", this.handleKeyDownBind);
+        document.addEventListener("keyup", this.handleKeyUpBind);
     }
 
         
@@ -89,14 +154,50 @@ export class HIDSubmoduleSimulation extends HIDSubmodule{
         2: HIDButtonBitField.Y,
         3: HIDButtonBitField.X,
         4: HIDButtonBitField.L,
+        5: HIDButtonBitField.R,
+        6: HIDButtonBitField.ZL,
+        7: HIDButtonBitField.ZR,
+        8: HIDButtonBitField.Minus,
+        9: HIDButtonBitField.Plus,
+        10: HIDButtonBitField.LeftStick,
+        11: HIDButtonBitField.RightSitck,
+        12: HIDButtonBitField.UpPad,
+        13: HIDButtonBitField.DownPad,
+        14: HIDButtonBitField.LeftPad,
+        15: HIDButtonBitField.RightPad
     };
 
     handleKeyDown(ev:KeyboardEvent){
         console.log(ev);
         if(ev.key === "ArrowUp"){
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, true).getCustomEvent());
         }else if(ev.key === "ArrowDown"){
-            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, true));
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, true).getCustomEvent());
+        }else if(ev.key === "ArrowLeft"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.LeftPad, true).getCustomEvent());
+        }else if(ev.key === "ArrowRight"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.RightPad, true).getCustomEvent());
+        }else if(ev.key === "Enter"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.A, true).getCustomEvent());
+        }else if(ev.key === "Escape"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.B, true).getCustomEvent());
+        }
+    }
+
+    handleKeyUp(ev:KeyboardEvent){
+        console.log(ev);
+        if(ev.key === "ArrowUp"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.UpPad, false).getCustomEvent());
+        }else if(ev.key === "ArrowDown"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.DownPad, false).getCustomEvent());
+        }else if(ev.key === "ArrowLeft"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.LeftPad, false).getCustomEvent());
+        }else if(ev.key === "ArrowRight"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.RightPad, false).getCustomEvent());
+        }else if(ev.key === "Enter"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.A, false).getCustomEvent());
+        }else if(ev.key === "Escape"){
+            document.activeElement.dispatchEvent(new HIDButtonEvent(HIDButtonBitField.B, false).getCustomEvent());
         }
     }
 
@@ -118,8 +219,19 @@ export class HIDSubmoduleSimulation extends HIDSubmodule{
                 }
                 return gamepad.buttons[index].pressed;
             });
-            pressedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(pressedKeys, true));
-            releasedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(releasedKeys, false));
+
+            let axisChanged = [false, false, false, false];
+            this.lastAxisReading = this.lastAxisReading.map((lastReading, index) => {
+                axisChanged[index] = axisChanged[index] || gamepad.axes[index] != lastReading;
+                return gamepad.axes[index];
+            });
+
+            pressedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(pressedKeys, true).getCustomEvent());
+            releasedKeys > 0 && document.activeElement.dispatchEvent(new HIDButtonEvent(releasedKeys, false).getCustomEvent());
+            (axisChanged[0] || axisChanged[1]) &&
+                document.activeElement.dispatchEvent(new HIDJoystickEvent(true, this.lastAxisReading[0], this.lastAxisReading[1]).getCustomEvent());
+            (axisChanged[2] || axisChanged[3]) &&
+                document.activeElement.dispatchEvent(new HIDJoystickEvent(false, this.lastAxisReading[2], this.lastAxisReading[3]).getCustomEvent());
         }
     }
 

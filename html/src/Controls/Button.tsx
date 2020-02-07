@@ -1,22 +1,24 @@
 import React from "react"
 import {createUseStyles} from "react-jss"
 import clsx from "clsx"
-import {Control, ControlOutputProps} from "./Control"
-import OutlineBox from "./OutlineBox"
-import { ActionMap } from "./Contexts/Actions"
+import {Control, ControlOutputProps} from "../Control"
+import OutlineBox from "../OutlineBox"
+import { ActionMap } from "../Contexts/Actions"
 
 const useStyles = createUseStyles({
-    listButton: {
+    button: {
         position: "relative",
-        border: "solid #d1d1d1",
-        borderWidth: "1px 0 0 0",
+        border: "solid 2px black",
+        borderRadius: 5,
         outline: "none"
     },
-    listButtonActive: {
+    buttonActive: {
         backgroundColor: "#fdfdfd"
     },
     contentBox: {
-        padding: "20px 15px"
+        width: "100%",
+        padding: "20px 0px",
+        textAlign: "center"
     },
     contentBoxHover: {
         backgroundColor: "#00f5ff17"
@@ -35,18 +37,26 @@ const useStyles = createUseStyles({
     } 
 });
 
-export default function ListButton({children, actionMap, onActivate}:{children:any, actionMap?:ActionMap, onActivate?:()=>void}){
+interface ButtonInputProps{
+    children:any;
+    actionMap?:ActionMap;
+    onActivate?:()=>void;
+    className?:string;
+    width?:number;
+}
+
+export default function Button(props:ButtonInputProps){
     const classes = useStyles();
+    const className = props.className ? props.className : null; 
 
-
-    return <Control actionMap={actionMap} onActivate={onActivate}>
+    return <Control actionMap={props.actionMap} onActivate={props.onActivate}>
         {({reference, isFocused, isTouched}:ControlOutputProps) =>
             <div ref={reference}
-                    className={clsx(classes.listButton,
-                                    isFocused && classes.listButtonActive)}>
+                    className={clsx(className, classes.button,
+                                    isFocused && classes.buttonActive)}>
                 <div className={clsx(classes.contentBox,
                     isTouched && classes.contentBoxHover)}>
-                    {children}
+                    {props.children}
                 </div>
                 <OutlineBox visible={isFocused}/>
             </div>

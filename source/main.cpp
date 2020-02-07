@@ -78,13 +78,10 @@ int main(int argc, char* argv[])
     WebCommonReply reply;
     WebExitReason exitReason;
 
-    webPageCreate(&config, "https://amicuchu.github.io/websessionExample/index.html");
+    webPageCreate(&config, "https://camitest.my.to");
     g_Logger.print("Web config created");
     WebSession webSession(&config.holder);
 
-    u32 dummyValA = 0;
-    webConfigSetJsExtension(&config, 1);
-    rc = _webTLVWrite(&config.arg, WebArgType_SessionBootMode, &dummyValA, sizeof(u32), sizeof(u32));
     u8 dummyVal = 1;
     rc = _webTLVWrite(&config.arg, WebArgType_SessionFlag, &dummyVal, sizeof(u8), sizeof(u8));
     if (R_FAILED(rc)) {
@@ -95,6 +92,11 @@ int main(int argc, char* argv[])
     WebIPCCoordinator coord{};
     coord.addSubmodule(1, std::unique_ptr<WebIPCHandler>(&hid));
 
+    webConfigSetJsExtension(&config, true);
+    webConfigSetPointer(&config, false);
+    webConfigSetBackgroundKind(&config, WebBackgroundKind::WebBackgroundKind_Unknown1);
+    webConfigSetFooter(&config, false);
+    webConfigSetBootFooterButtonVisible(&config, WebFooterButtonId_Max, false);
     rc = webConfigSetWhitelist(&config, "^http*");
     if (R_SUCCEEDED(rc)) {
         g_Logger.print("TLV configured");

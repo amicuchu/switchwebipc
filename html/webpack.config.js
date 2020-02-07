@@ -40,7 +40,8 @@ const envConfig = {
     plugins: [
         new HtmlWebpackPlugin({
             meta: {
-                viewport: "user-scalable=no, width=device-width, height=device-height"
+                viewport: "user-scalable=no, width=device-width, height=device-height",
+                "focus-ring-visibility": "hidden"
             }
         })
     ]

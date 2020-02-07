@@ -5,20 +5,24 @@ import ButtonA from "./Icons/ButtonA";
 import ButtonX from "./Icons/ButtonX";
 import {ActionContext, ActionMap, Action} from "./Contexts/Actions"
 import {HIDButtonBitField} from "./WebIPCHID"
+import { IconCommonProps, IconButtonMap } from "./Icon";
 
 const useStyles = createUseStyles({
     commandBar: {
         boxSizing: "border-box",
-        position: "absolute",
         width: "100%",
         height: "70px",
-        bottom: "0",
         padding: "0 30px"
     },
     separator: {
         width: "100%",
         height: "1px",
         backgroundColor: "black"
+    },
+    commandBarBox: {
+        display: "flex",
+        flexDirection: "row-reverse",
+        height: "100%"
     }
 });
 
@@ -49,15 +53,13 @@ export default function CommandBar(){
         console.log(res);
         return res;
     }, [actionMap]);
-    
-    const iconButtonMap = React.useMemo(() => new Map<HIDButtonBitField, React.FunctionComponent>([
-        [HIDButtonBitField.A, ButtonA],
-        [HIDButtonBitField.X, ButtonX]
-    ]), []);
 
     return <div className={classes.commandBar}>
         <div className={classes.separator}/>
-        {actions.map((action)=>
-            <CommandButton iconButton={React.createElement(iconButtonMap.get(action.assignedButton))} key={action.assignedButton} text={action.label}/>)}
+        <div className={classes.commandBarBox}>
+            {actions.map((action)=>
+                <CommandButton iconButton={React.createElement(IconButtonMap.get(action.assignedButton))}
+                            key={action.assignedButton} text={action.label} callback={action.callback}/>)}
+        </div>
     </div>
 }

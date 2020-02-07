@@ -61,6 +61,7 @@ class ActionManager{
 
     broadcastNewActions(){
         this.cleanUnattachedActions();
+        console.log(this.actionHandlers);
         const currentActionMap:ActionMap = new Map();
         for(const actionMap of this.actions){
             for(const [actionButton, action] of actionMap){
@@ -72,10 +73,12 @@ class ActionManager{
 
     addListener(handler:(map:ActionMap)=>void){
         this.actionHandlers.push(handler);
+        this.broadcastNewActions();
     }
 
     removeHandler(handler:(map:ActionMap)=>void){
-        
+        const index = this.actionHandlers.indexOf(handler);
+        this.actionHandlers.splice(index, 1);
     }
 
 
@@ -84,7 +87,9 @@ class ActionManager{
 export const ActionContext = React.createContext<ActionManager>(null);
 
 export function ActionContextProvider({children}:{children:any}){
-    return <ActionContext.Provider value={new ActionManager()}>
+    const actionManager = React.useRef(new ActionManager());
+
+    return <ActionContext.Provider value={actionManager.current}>
         {children}
     </ActionContext.Provider>
 }

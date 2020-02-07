@@ -7,6 +7,7 @@ import { AnimationContext } from "./Contexts/Animation";
 const useStyles = createUseStyles({
     outlineBox: {
         position: "absolute",
+        pointerEvents: "none",
         top: "0px",
         height: "100%",
         width: "100%",
@@ -37,9 +38,9 @@ export default function OutlineBox({visible} : {visible:boolean}){
     const bounceUp = React.useCallback(() => {
         ref.current.animate([
             {transform: "translateY(0px)"},
-            {transform: "translateY(-5px)", state:0.4},
+            {transform: "translateY(-10px)", state:0.4},
             {transform: "translateY(0px)", state:0.8},
-            {transform: "translateY(-2px)", state:0.9},
+            {transform: "translateY(-5px)", state:0.9},
             {transform: "translateY(0px)"}
         ], {duration: 200, iterations: 1});
     }, [ref.current]);
@@ -47,10 +48,30 @@ export default function OutlineBox({visible} : {visible:boolean}){
     const bounceDown = React.useCallback(() => {
         ref.current.animate([
             {transform: "translateY(0px)"},
-            {transform: "translateY(5px)", state:0.4},
+            {transform: "translateY(10px)", state:0.4},
             {transform: "translateY(0px)", state:0.8},
-            {transform: "translateY(2px)", state:0.9},
+            {transform: "translateY(5px)", state:0.9},
             {transform: "translateY(0px)"}
+        ], {duration: 200, iterations: 1});
+    }, [ref.current]);
+
+    const bounceLeft = React.useCallback(() => {
+        ref.current.animate([
+            {transform: "translateX(0px)"},
+            {transform: "translateX(-10px)", state:0.4},
+            {transform: "translateX(0px)", state:0.8},
+            {transform: "translateX(-5px)", state:0.9},
+            {transform: "translateX(0px)"}
+        ], {duration: 200, iterations: 1});
+    }, [ref.current]);
+
+    const bounceRight = React.useCallback(() => {
+        ref.current.animate([
+            {transform: "translateX(0px)"},
+            {transform: "translateX(10px)", state:0.4},
+            {transform: "translateX(0px)", state:0.8},
+            {transform: "translateX(5px)", state:0.9},
+            {transform: "translateX(0px)"}
         ], {duration: 200, iterations: 1});
     }, [ref.current]);
 
@@ -60,9 +81,13 @@ export default function OutlineBox({visible} : {visible:boolean}){
             if(ref.current){
                 animationManager.registerAnimation("bounceUp", bounceUp, ref.current);
                 animationManager.registerAnimation("bounceDown", bounceDown, ref.current);
+                animationManager.registerAnimation("bounceLeft", bounceLeft, ref.current);
+                animationManager.registerAnimation("bounceRight", bounceRight, ref.current);
             }else{
                 animationManager.unregisterUnattachedOwners("bounceUp");
                 animationManager.unregisterUnattachedOwners("bounceDown");
+                animationManager.unregisterUnattachedOwners("bounceLeft");
+                animationManager.unregisterUnattachedOwners("bounceRight");
             }
         }
     }, [visible]);
